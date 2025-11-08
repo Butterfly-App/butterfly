@@ -87,11 +87,6 @@ export default async function Home() {
             Next.js Docs
           </a>
 
-          {/* {user && canSeeCreateReport && (
-            <Link href="/createreport">
-              <Button>Create Report</Button>
-            </Link>
-          )} */}
         </div>
       </main>
     </div>

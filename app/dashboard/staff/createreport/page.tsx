@@ -15,7 +15,7 @@ export default async function CreateReportPage() {
       .select('name')
     
     if (error) {
-      console.error('Error fetching client names:', error);
+      console.error('Error fetching clients:', error);
     }
   
   return (
