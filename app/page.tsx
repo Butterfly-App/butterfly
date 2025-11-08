@@ -10,6 +10,28 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const { data, error } = await supabase
+  .from('profiles')
+  .select('role')
+  .eq('id', user?.id)
+  // get auth user (avoid destructuring into `data` twice)
+  const { data: authData } = await supabase.auth.getUser();
+  const authUser = authData?.user ?? null;
+
+  const profileRes = authUser ? 
+    await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', authUser.id)
+      .single()
+    : { data: null, error: null };
+  const role = profileRes.data?.role ?? null;
+
+
+  const canSeeCreateReport =
+    !!user && (role === "staff");
+
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
@@ -70,7 +92,7 @@ export default async function Home() {
             Next.js Docs
           </a>
 
-          {user && (
+          {user && canSeeCreateReport && (
             <Link href="/createreport">
               <Button>Create Report</Button>
             </Link>
