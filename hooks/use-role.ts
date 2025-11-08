@@ -163,15 +163,16 @@ export function useHasAnyRole(requiredRoles: UserRole[]) {
 
 /**
  * Hook to check if the current user has at least the specified role level
- * Role hierarchy: user < staff < admin
+ * Role hierarchy: user < guardian < staff < admin
  */
 export function useHasMinimumRole(minimumRole: UserRole) {
   const { role, loading } = useRole();
 
   const roleHierarchy: Record<UserRole, number> = {
     user: 1,
-    staff: 2,
-    admin: 3,
+    guardian: 2,
+    staff: 3,
+    admin: 4,
   };
 
   const hasMinimum = role

@@ -25,7 +25,7 @@ export async function getUserRole(): Promise<UserRole | null> {
     .select('role')
     .eq('user_id', user.id)
     .single();
-
+  console.log(error)
   if (error || !profile) {
     return null;
   }
@@ -89,7 +89,7 @@ export async function hasAnyRole(requiredRoles: UserRole[]): Promise<boolean> {
 
 /**
  * Check if the current user has at least the specified role level
- * Role hierarchy: user < staff < admin
+ * Role hierarchy: user < guardian < staff < admin
  * Use this in Server Components and Server Actions
  */
 export async function hasMinimumRole(minimumRole: UserRole): Promise<boolean> {
@@ -101,8 +101,9 @@ export async function hasMinimumRole(minimumRole: UserRole): Promise<boolean> {
 
   const roleHierarchy: Record<UserRole, number> = {
     user: 1,
-    staff: 2,
-    admin: 3,
+    guardian: 2,
+    staff: 3,
+    admin: 4,
   };
 
   return roleHierarchy[currentRole] >= roleHierarchy[minimumRole];

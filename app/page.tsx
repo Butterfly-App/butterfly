@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getUserRole } from "@/lib/auth/roles-server";
 import { SignOutButton } from "@/components/auth/signout-button";
 import { Button } from "@/components/ui/button";
 
@@ -9,6 +11,21 @@ export default async function Home() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // If user is logged in, redirect to their role-specific dashboard
+  if (user) {
+    const role = await getUserRole();
+
+    if (role === "admin") {
+      redirect("/dashboard/admin");
+    } else if (role === "staff") {
+      redirect("/dashboard/staff");
+    } else if (role === "guardian") {
+      redirect("/dashboard/guardian");
+    } else if (role === "user") {
+      redirect("/dashboard/user");
+    }
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
