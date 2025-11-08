@@ -15,9 +15,11 @@ type ScheduleRow = {
   location: string | null;
   start_time: string;
   end_time: string;
-  clients?: { name?: string | null } | null;
-  staff?: { name?: string | null } | null;
+  client_id: string | null;
+  staff_id: string | null;
 };
+
+type Person = { id: string; name: string | null };
 
 const locales = { 'en-CA': enCA };
 const localizer = dateFnsLocalizer({
@@ -33,41 +35,72 @@ export default function ScheduleCalendarPage() {
   const supabase = createClient();
 
   const [rows, setRows] = useState<ScheduleRow[]>([]);
+  const [clients, setClients] = useState<Person[]>([]);
+  const [staff, setStaff] = useState<Person[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 👇 make the calendar controlled
+  // controlled calendar state
   const [view, setView] = useState<View>(Views.WEEK);
   const [date, setDate] = useState<Date>(new Date());
 
+  // fetch data (no joins)
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase
-        .from('schedule')
-        .select('id, program, location, start_time, end_time, clients(name), staff(name)')
-        .order('start_time', { ascending: true });
+      try {
+        const [{ data: sched }, { data: c }, { data: s }] = await Promise.all([
+          supabase
+            .from('schedule')
+            .select('id, program, location, start_time, end_time, client_id, staff_id')
+            .order('start_time', { ascending: true }),
+          supabase.from('clients').select('id, name'),
+          supabase.from('staff').select('id, name'),
+        ]);
 
-      setRows(error ? [] : (data || []));
-      setLoading(false);
+        setRows(sched || []);
+        setClients(c || []);
+        setStaff(s || []);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, [supabase]);
 
+  // build quick lookup maps
+  const clientNameById = useMemo(() => {
+    const m: Record<string, string> = {};
+    for (const p of clients) if (p?.id) m[p.id] = p.name ?? '';
+    return m;
+  }, [clients]);
+
+  const staffNameById = useMemo(() => {
+    const m: Record<string, string> = {};
+    for (const p of staff) if (p?.id) m[p.id] = p.name ?? '';
+    return m;
+  }, [staff]);
+
+  // ✅ define events
   const events = useMemo(
     () =>
-      rows.map((r) => ({
-        id: r.id,
-        title:
+      rows.map((r) => {
+        const client = r.client_id ? clientNameById[r.client_id] ?? '' : '';
+        const staffName = r.staff_id ? staffNameById[r.staff_id] ?? '' : '';
+        const title =
           `${r.program ?? 'Session'}`
-          + (r.clients?.name ? ` • ${r.clients?.name}` : '')
-          + (r.location ? ` @ ${r.location}` : ''),
-        start: new Date(r.start_time),
-        end: new Date(r.end_time),
-        resource: r,
-      })),
-    [rows]
+          + (client ? ` • ${client}` : '')
+          + (r.location ? ` @ ${r.location}` : '');
+        return {
+          id: r.id,
+          title,
+          start: new Date(r.start_time),
+          end: new Date(r.end_time),
+          resource: { client, staffName, location: r.location },
+        };
+      }),
+    [rows, clientNameById, staffNameById]
   );
 
   function EventProp({ event }: any) {
-    const client = event.resource?.clients?.name ?? '';
+    const client = event.resource?.client ?? '';
     const loc = event.resource?.location ?? '';
     return (
       <div className="leading-tight">
@@ -83,10 +116,7 @@ export default function ScheduleCalendarPage() {
     <div className="p-4">
       <div className="mb-3 flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Schedule</h1>
-        <Link
-          href="/schedule/new"
-          className="rounded bg-blue-600 px-3 py-2 text-white hover:bg-blue-700"
-        >
+        <Link href="/schedule/new" className="rounded bg-blue-600 px-3 py-2 text-white hover:bg-blue-700">
           + New
         </Link>
       </div>
@@ -98,12 +128,10 @@ export default function ScheduleCalendarPage() {
           <Calendar
             localizer={localizer}
             events={events}
-            // 👇 controlled props
             view={view}
             date={date}
             onView={(v) => setView(v)}
-            onNavigate={(newDate) => setDate(newDate)}
-            //
+            onNavigate={(d) => setDate(d)}
             defaultView={Views.WEEK}
             views={[Views.DAY, Views.WEEK, Views.MONTH, Views.AGENDA]}
             step={30}
@@ -112,13 +140,13 @@ export default function ScheduleCalendarPage() {
             selectable
             components={{ event: EventProp }}
             onSelectEvent={(e) => router.push(`/schedule/${e.id}`)}
-            onSelectSlot={({ start, end }) => {
-              const qs = new URLSearchParams({
-                start_time: start.toISOString(),
-                end_time: end.toISOString(),
-              });
-              router.push(`/schedule/new?${qs.toString()}`);
-            }}
+onSelectSlot={({ start, end }) => {
+  const qs = new URLSearchParams({
+    start: String(start.getTime()),   // ✅ epoch ms
+    end: String(end.getTime()),
+  });
+  router.push(`/schedule/new?${qs.toString()}`);
+}}
           />
         </div>
       )}

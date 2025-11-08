@@ -2,9 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { format } from 'date-fns';
 import { createClient } from '@/lib/supabase/client';
 
 type Row = { id: string; name: string };
+
+const toInputLocal = (d: Date | null) => (d ? format(d, "yyyy-MM-dd'T'HH:mm") : '');
+const localInputToUTC = (s: string) => (s ? new Date(s).toISOString() : null);
 
 export default function NewSchedulePage() {
   const supabase = createClient();
@@ -22,21 +26,18 @@ export default function NewSchedulePage() {
     notes: '',
   });
 
-  const [saving, setSaving] = useState(false);              // ✅ added
+  const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  // Prefill from calendar selection (?start_time=&end_time=)
+  // Prefill from calendar selection (?start=<ms>&end=<ms>) without tz shift
   useEffect(() => {
-    const s = searchParams.get('start_time');
-    const e = searchParams.get('end_time');
-    const toLocalInput = (iso: string | null) =>
-      iso ? new Date(iso).toISOString().slice(0, 16) : '';
+    const startMs = searchParams.get('start');
+    const endMs = searchParams.get('end');
     setForm((f) => ({
       ...f,
-      start_time: toLocalInput(s),
-      end_time: toLocalInput(e),
+      start_time: startMs ? toInputLocal(new Date(Number(startMs))) : f.start_time,
+      end_time: endMs ? toInputLocal(new Date(Number(endMs))) : f.end_time,
     }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   // Load dropdown data
@@ -54,21 +55,35 @@ export default function NewSchedulePage() {
     setSaving(true);
     setMessage(null);
 
-    const { error } = await supabase.from('schedule').insert([form]);
+    // Optional: quick guard
+    if (form.start_time && form.end_time) {
+      const start = new Date(form.start_time).getTime();
+      const end = new Date(form.end_time).getTime();
+      if (end <= start) {
+        setSaving(false);
+        setMessage('❌ End time must be after start time');
+        return;
+      }
+    }
 
+    const payload = {
+      client_id: form.client_id || null,
+      staff_id: form.staff_id || null,
+      program: form.program || null,
+      location: form.location || null,
+      start_time: localInputToUTC(form.start_time), // store UTC
+      end_time: localInputToUTC(form.end_time),     // store UTC
+      notes: form.notes || null,
+    };
+
+    const { error } = await supabase.from('schedule').insert([payload]);
     setSaving(false);
-    if (error) setMessage(`❌ ${error.message}`);
-    else {
-      setMessage('✅ Schedule created!');
-      setForm({
-        client_id: '',
-        staff_id: '',
-        program: '',
-        location: '',
-        start_time: '',
-        end_time: '',
-        notes: '',
-      });
+
+    if (error) {
+      setMessage(`❌ ${error.message}`);
+    } else {
+      // Go back to calendar so you immediately see the event
+      window.location.href = '/schedule';
     }
   }
 
