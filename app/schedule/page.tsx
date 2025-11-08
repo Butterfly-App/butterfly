@@ -89,7 +89,7 @@ export default function ScheduleCalendarPage() {
           + (client ? ` • ${client}` : '')
           + (r.location ? ` @ ${r.location}` : '');
         return {
-          id: r.id,
+          id: String(r.id),
           title,
           start: new Date(r.start_time),
           end: new Date(r.end_time),
@@ -139,7 +139,19 @@ export default function ScheduleCalendarPage() {
             popup
             selectable
             components={{ event: EventProp }}
-            onSelectEvent={(e) => router.push(`/schedule/${e.id}`)}
+onSelectEvent={(e) => {
+  console.log('event clicked:', e);
+  const id = e?.id ?? e?.resource?.id;
+  if (!id) {
+    alert('No id on event');
+    return;
+  }
+  // encode in case it's a UUID or something funky
+  const path = `/schedule/${encodeURIComponent(String(id))}`;
+  // Make sure this component has 'use client' and router from next/navigation
+  router.push(path);
+}}
+
 onSelectSlot={({ start, end }) => {
   const qs = new URLSearchParams({
     start: String(start.getTime()),   // ✅ epoch ms

@@ -4,87 +4,107 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
-type SchedRow = {
+type Sched = {
   id: string;
   program: string | null;
   location: string | null;
   notes: string | null;
-  start_time: string; // ISO
-  end_time: string;   // ISO
-  clients?: { name?: string | null } | null;
-  staff?: { name?: string | null } | null;
+  start_time: string;  // ISO/timestamptz
+  end_time: string;    // ISO/timestamptz
+  client_id: string | null;
+  staff_id: string | null;
 };
 
-export default function ScheduleDetailPage() {
-  const params = useParams(); // don't assume typing
-  const id = useMemo(() => {
-    const raw = (params as any)?.id;
-    return typeof raw === 'string' ? raw : Array.isArray(raw) ? raw[0] : undefined;
-  }, [params]);
+type Person = { id: string; name: string | null };
 
+export default function ScheduleDetailPage() {
+  const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const supabase = createClient();
 
-  const [row, setRow] = useState<SchedRow | null>(null);
+  const [row, setRow] = useState<Sched | null>(null);
+  const [client, setClient] = useState<Person | null>(null);
+  const [staff, setStaff] = useState<Person | null>(null);
   const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
-  const [err, setErr] = useState<string | null>(null);
 
+  // fetch the schedule row, then (optionally) fetch names
   useEffect(() => {
-    if (!id) {
-      setErr('Missing schedule id in route.');
-      setLoading(false);
-      return;
-    }
+    let cancelled = false;
+
     (async () => {
       try {
-        const { data, error } = await supabase
+        // 1) get schedule row (no joins = works even without FKs)
+        const { data: sched, error } = await supabase
           .from('schedule')
-          .select(
-            'id, program, location, start_time, end_time, notes, clients(name), staff(name)'
-          )
+          .select('id, program, location, notes, start_time, end_time, client_id, staff_id')
           .eq('id', id)
           .single();
 
-        if (error) {
-          setErr(error.message);
-          setRow(null);
-        } else {
-          setRow(data as SchedRow);
+        if (error) throw error;
+        if (cancelled) return;
+        setRow(sched as Sched);
+
+        // 2) fetch names if present
+        if (sched?.client_id) {
+          const { data } = await supabase
+            .from('clients')
+            .select('id, name')
+            .eq('id', sched.client_id)
+            .single();
+          if (!cancelled) setClient(data as Person);
+        }
+        if (sched?.staff_id) {
+          const { data } = await supabase
+            .from('staff')
+            .select('id, name')
+            .eq('id', sched.staff_id)
+            .single();
+          if (!cancelled) setStaff(data as Person);
         }
       } catch (e: any) {
-        setErr(e?.message || 'Unknown error loading schedule.');
-        setRow(null);
+        if (!cancelled) setErr(e?.message || 'Failed to load schedule');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [id, supabase]);
 
-  async function updateField(field: keyof SchedRow, value: string) {
-    if (!id) return;
-    setSaving(true);
-    setMsg(null);
-    setErr(null);
+  async function updateField(field: keyof Sched, value: string | null) {
     try {
-      const { error } = await supabase.from('schedule').update({ [field]: value }).eq('id', id);
-      if (error) {
-        setErr(error.message);
-      } else {
-        setMsg('✅ Saved');
-        setRow((prev) => (prev ? { ...prev, [field]: value } as SchedRow : prev));
-      }
+      setSaving(true);
+      setMsg(null);
+      setErr(null);
+      const { error } = await supabase
+        .from('schedule')
+        .update({ [field]: value })
+        .eq('id', id);
+      if (error) throw error;
+
+      // reflect locally
+      setRow((r) => (r ? { ...r, [field]: value } as Sched : r));
+      setMsg('✅ Saved');
     } catch (e: any) {
-      setErr(e?.message || 'Failed to save');
+      setErr(e?.message || 'Save failed');
     } finally {
       setSaving(false);
     }
   }
 
-  // Safe date formatting
-  const startText = row?.start_time ? new Date(row.start_time).toLocaleString() : '—';
-  const endText = row?.end_time ? new Date(row.end_time).toLocaleString() : '—';
+  const startText = useMemo(
+    () => (row?.start_time ? new Date(row.start_time).toLocaleString() : '—'),
+    [row?.start_time]
+  );
+  const endText = useMemo(
+    () => (row?.end_time ? new Date(row.end_time).toLocaleString() : '—'),
+    [row?.end_time]
+  );
 
   if (loading) return <div className="p-6">Loading…</div>;
 
@@ -97,7 +117,7 @@ export default function ScheduleDetailPage() {
           className="rounded bg-gray-200 px-3 py-2"
           onClick={() => router.push('/schedule')}
         >
-          Back
+          ← Back
         </button>
       </div>
     );
@@ -109,7 +129,7 @@ export default function ScheduleDetailPage() {
         Not found
         <div className="mt-3">
           <button className="rounded bg-gray-200 px-3 py-2" onClick={() => router.push('/schedule')}>
-            Back
+            ← Back
           </button>
         </div>
       </div>
@@ -117,10 +137,12 @@ export default function ScheduleDetailPage() {
   }
 
   return (
-    <div className="max-w-xl mx-auto p-6 space-y-3">
+    <div className="max-w-xl mx-auto p-6 space-y-4">
       <h1 className="text-2xl font-semibold">Session Details</h1>
+
       <div className="text-sm text-gray-600">
-        Client: {row.clients?.name ?? '—'} · Staff: {row.staff?.name ?? '—'}
+        <div><span className="font-medium">Client:</span> {client?.name ?? '—'}</div>
+        <div><span className="font-medium">Staff:</span> {staff?.name ?? '—'}</div>
       </div>
 
       <label className="block">
@@ -128,7 +150,7 @@ export default function ScheduleDetailPage() {
         <input
           className="w-full border p-2 rounded"
           defaultValue={row.program ?? ''}
-          onBlur={(e) => updateField('program', e.target.value)}
+          onBlur={(e) => updateField('program', e.target.value || null)}
         />
       </label>
 
@@ -137,7 +159,7 @@ export default function ScheduleDetailPage() {
         <input
           className="w-full border p-2 rounded"
           defaultValue={row.location ?? ''}
-          onBlur={(e) => updateField('location', e.target.value)}
+          onBlur={(e) => updateField('location', e.target.value || null)}
         />
       </label>
 
@@ -147,18 +169,18 @@ export default function ScheduleDetailPage() {
           className="w-full border p-2 rounded"
           rows={3}
           defaultValue={row.notes ?? ''}
-          onBlur={(e) => updateField('notes', e.target.value)}
+          onBlur={(e) => updateField('notes', e.target.value || null)}
         />
       </label>
 
       <div className="text-sm">
-        Start: {startText} <br />
-        End: {endText}
+        <div><span className="font-medium">Start:</span> {startText}</div>
+        <div><span className="font-medium">End:</span> {endText}</div>
       </div>
 
       <div className="flex items-center gap-2">
         <button className="rounded bg-gray-200 px-3 py-2" onClick={() => router.push('/schedule')}>
-          Back
+          ← Back
         </button>
         {saving && <span className="text-xs">Saving…</span>}
         {msg && <span className="text-xs">{msg}</span>}
