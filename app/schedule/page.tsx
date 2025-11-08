@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 
 import { Calendar, dateFnsLocalizer, Views, View } from 'react-big-calendar';
-import { format, parse, startOfWeek, getDay } from 'date-fns';
-import enCA from 'date-fns/locale/en-CA';
+import { format, parse, startOfWeek, getDay} from 'date-fns';
+import { enCA } from 'date-fns/locale';
 
 type ScheduleRow = {
   id: string;
