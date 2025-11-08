@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 
 import { Calendar, dateFnsLocalizer, Views, View } from 'react-big-calendar';
-import { format, parse, startOfWeek, getDay} from 'date-fns';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { enCA } from 'date-fns/locale';
 
 type ScheduleRow = {
@@ -17,6 +17,14 @@ type ScheduleRow = {
   end_time: string;
   client_id: string | null;
   staff_id: string | null;
+};
+
+type CalEvent = {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  resource: { client: string; staffName: string; location: string | null };
 };
 
 type Person = { id: string; name: string | null };
@@ -38,8 +46,6 @@ export default function ScheduleCalendarPage() {
   const [clients, setClients] = useState<Person[]>([]);
   const [staff, setStaff] = useState<Person[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // controlled calendar state
   const [view, setView] = useState<View>(Views.WEEK);
   const [date, setDate] = useState<Date>(new Date());
 
@@ -78,7 +84,7 @@ export default function ScheduleCalendarPage() {
     return m;
   }, [staff]);
 
-  // ✅ define events
+  // define events
   const events = useMemo(
     () =>
       rows.map((r) => {
@@ -93,7 +99,7 @@ export default function ScheduleCalendarPage() {
           title,
           start: new Date(r.start_time),
           end: new Date(r.end_time),
-          resource: { client, staffName, location: r.location },
+          resource: { client, staffName, location: r.location, id: r.id },
         };
       }),
     [rows, clientNameById, staffNameById]
@@ -125,7 +131,7 @@ export default function ScheduleCalendarPage() {
         <p>Loading…</p>
       ) : (
         <div style={{ height: '75vh' }}>
-          <Calendar
+          <Calendar<CalEvent>
             localizer={localizer}
             events={events}
             view={view}
@@ -139,26 +145,15 @@ export default function ScheduleCalendarPage() {
             popup
             selectable
             components={{ event: EventProp }}
-onSelectEvent={(e) => {
-  console.log('event clicked:', e);
-  const id = e?.id ?? e?.resource?.id;
-  if (!id) {
-    alert('No id on event');
-    return;
-  }
-  // encode in case it's a UUID or something funky
-  const path = `/schedule/${encodeURIComponent(String(id))}`;
-  // Make sure this component has 'use client' and router from next/navigation
-  router.push(path);
-}}
+            onSelectEvent={(e) => router.push(`/schedule/${encodeURIComponent(e.id)}`)}
 
-onSelectSlot={({ start, end }) => {
-  const qs = new URLSearchParams({
-    start: String(start.getTime()),   // ✅ epoch ms
-    end: String(end.getTime()),
-  });
-  router.push(`/schedule/new?${qs.toString()}`);
-}}
+            onSelectSlot={({ start, end }) => {
+              const qs = new URLSearchParams({
+                start: String(start.getTime()),   // ✅ epoch ms
+                end: String(end.getTime()),
+              });
+              router.push(`/schedule/new?${qs.toString()}`);
+            }}
           />
         </div>
       )}
