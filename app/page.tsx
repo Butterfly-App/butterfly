@@ -10,26 +10,22 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data, error } = await supabase
-  .from('profiles')
-  .select('role')
-  .eq('id', user?.id)
-  // get auth user (avoid destructuring into `data` twice)
-  const { data: authData } = await supabase.auth.getUser();
-  const authUser = authData?.user ?? null;
+  // // get auth user (avoid destructuring into `data` twice)
+  // const { data: authData } = await supabase.auth.getUser();
+  // const authUser = authData?.user ?? null;
 
-  const profileRes = authUser ? 
-    await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', authUser.id)
-      .single()
-    : { data: null, error: null };
-  const role = profileRes.data?.role ?? null;
+  // const profileRes = authUser ? 
+  //   await supabase
+  //     .from('profiles')
+  //     .select('role')
+  //     .eq('id', authUser.id)
+  //     .single()
+  //   : { data: null, error: null };
+  // const role = profileRes.data?.role ?? null;
 
 
-  const canSeeCreateReport =
-    !!user && (role === "staff");
+  // const canSeeCreateReport =
+  //   !!user && (role === "staff");
 
 
   return (
@@ -92,11 +88,11 @@ export default async function Home() {
             Next.js Docs
           </a>
 
-          {user && canSeeCreateReport && (
+          {/* {user && canSeeCreateReport && (
             <Link href="/createreport">
               <Button>Create Report</Button>
             </Link>
-          )}
+          )} */}
         </div>
       </main>
     </div>
