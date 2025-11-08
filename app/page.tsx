@@ -69,6 +69,12 @@ export default async function Home() {
           >
             Next.js Docs
           </a>
+
+          {user && (
+            <Link href="/createreport">
+              <Button>Create Report</Button>
+            </Link>
+          )}
         </div>
       </main>
     </div>
