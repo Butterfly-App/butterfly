@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getUserRole } from "@/lib/auth/roles-server";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default async function StaffDashboard() {
   const supabase = await createClient();
@@ -84,17 +86,25 @@ export default async function StaffDashboard() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Reports</CardTitle>
-              <CardDescription>Generate reports</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Create reports for case management.
-              </p>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Reports</CardTitle>
+                <CardDescription>Review and Generate reports</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col sm:flex-row gap-2 mb-4">
+                  <Link href="/dashboard/staff/viewreport">
+                    <Button>View Reports</Button>
+                  </Link>
+                  <Link href="/dashboard/staff/createreport">
+                    <Button>Create Report</Button>
+                  </Link>
+                </div>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  See list of reports and create new reports.
+                </p>
+              </CardContent>
+            </Card>      
 
           <Card>
             <CardHeader>
@@ -107,6 +117,9 @@ export default async function StaffDashboard() {
               </p>
             </CardContent>
           </Card>
+
+          
+          
         </div>
       </div>
     </DashboardLayout>
