@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { format } from 'date-fns';
 import { createClient } from '@/lib/supabase/client';
@@ -10,9 +10,9 @@ type Row = { id: string; name: string };
 const toInputLocal = (d: Date | null) => (d ? format(d, "yyyy-MM-dd'T'HH:mm") : '');
 const localInputToUTC = (s: string) => (s ? new Date(s).toISOString() : null);
 
-export default function NewSchedulePage() {
-  const supabase = createClient();
+function NewScheduleForm() {
   const searchParams = useSearchParams();
+  const supabase = createClient();
 
   const [clients, setClients] = useState<Row[]>([]);
   const [staff, setStaff] = useState<Row[]>([]);
@@ -180,5 +180,14 @@ export default function NewSchedulePage() {
 
       {message && <p className="mt-4 text-sm">{message}</p>}
     </div>
+  );
+}
+
+// New wrapper component
+export default function NewSchedulePage() {
+  return (
+    <Suspense fallback={<div className="max-w-xl mx-auto p-6">Loading...</div>}>
+      <NewScheduleForm />
+    </Suspense>
   );
 }
