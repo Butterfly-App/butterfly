@@ -16,6 +16,11 @@ export default function ReportForm({ reporttitles }: ReportFormProps) {
     <div className="w-full mt-8">
       <h2 className="text-xl font-semibold mb-4">Report List</h2>
       <form className="space-y-2">
+        
+        {(!reporttitles || reporttitles.length === 0) && (
+          <p className="text-sm text-red-600">No reports found.</p>
+        )}
+
         {reporttitles?.map((report) => (
           <div key={report.title} className="flex items-center space-x-2">
             <input
@@ -36,9 +41,8 @@ export default function ReportForm({ reporttitles }: ReportFormProps) {
           </div>
         ))}
       </form>
-      {selectedReport && (
-        <p className="mt-4">Selected report: {selectedReport}</p>
-      )}
+      {/*selectedReport && (<p className="mt-4">Selected report: {selectedReport}</p>)*/}
+      {selectedReport && <p className="mt-4">Selected report: {selectedReport}</p>}
     </div>
   );
 }

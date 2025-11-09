@@ -13,7 +13,7 @@ export default async function ViewReportPage() {
     const { data: reporttitles, error } = await supabase
       .from('reports')
       .select('title')
-    
+    console.log('Fetched report titles:', error);
     if (error) {
       console.error('Error fetching reports:', error);
     }
