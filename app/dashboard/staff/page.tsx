@@ -3,8 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getUserRole } from "@/lib/auth/roles-server";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { StaffNavbar } from "@/components/staff/staff-navbar";
 
 export default async function StaffDashboard() {
   const supabase = await createClient();
@@ -22,6 +21,7 @@ export default async function StaffDashboard() {
     if (role === "user") redirect("/dashboard/user");
     redirect("/login");
   }
+  
 
   return (
     <DashboardLayout
@@ -30,90 +30,76 @@ export default async function StaffDashboard() {
       title="Staff Dashboard"
     >
       <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Welcome, Staff Member</h2>
-          <p className="text-zinc-600 dark:text-zinc-400">
-            Manage services and support for users.
-          </p>
-        </div>
+        <StaffNavbar />
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle>My Cases</CardTitle>
-              <CardDescription>Active user cases</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                View and manage your assigned cases.
-              </p>
-            </CardContent>
-          </Card>
+        <div className="px-6 space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">Welcome, Staff Member</h2>
+            <p className="text-zinc-600 dark:text-zinc-400">
+              Manage services and support for users and guardians.
+            </p>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Service Plans</CardTitle>
-              <CardDescription>User service plans</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Create and update service plans for users.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Appointments</CardTitle>
-              <CardDescription>Schedule and appointments</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Manage your appointment calendar.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Progress Notes</CardTitle>
-              <CardDescription>Document user progress</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Record progress notes and observations.
-              </p>
-            </CardContent>
-          </Card>
-
+          {/* Quick Stats */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <Card>
-              <CardHeader>
-                <CardTitle>Reports</CardTitle>
-                <CardDescription>Review and Generate reports</CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Users</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-col sm:flex-row gap-2 mb-4">
-                  <Link href="/dashboard/staff/viewreport">
-                    <Button>View Reports</Button>
-                  </Link>
-                  <Link href="/dashboard/staff/createreport">
-                    <Button>Create Report</Button>
-                  </Link>
-                </div>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  See list of reports and create new reports.
+                <div className="text-2xl font-bold">-</div>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                  Active service recipients
                 </p>
               </CardContent>
-            </Card>      
+            </Card>
 
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">My Cases</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">-</div>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                  Assigned to you
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Appointments</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">-</div>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                  This week
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pending Notes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">-</div>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                  Awaiting completion
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Recent Activity */}
           <Card>
             <CardHeader>
-              <CardTitle>Resources</CardTitle>
-              <CardDescription>Staff resources</CardDescription>
+              <CardTitle>Recent Activity</CardTitle>
+              <CardDescription>Your latest actions and updates</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Access training and support materials.
+                No recent activity to display.
               </p>
             </CardContent>
           </Card>
