@@ -41,7 +41,6 @@ export default function ReportForm({ reporttitles }: ReportFormProps) {
           </div>
         ))}
       </form>
-      {/*selectedReport && (<p className="mt-4">Selected report: {selectedReport}</p>)*/}
       {selectedReport && <p className="mt-4">Selected report: {selectedReport}</p>}
     </div>
   );
