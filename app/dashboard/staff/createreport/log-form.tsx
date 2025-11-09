@@ -28,7 +28,8 @@ export default function LogForm({ logs, clientName }: LogFormProps) {
 
   // Format log content excluding title fields
   const formatLogContent = (log: Record<string, any>) => {
-    const excludedFields = ['creator', 'created_at', 'client_id', 'id'];
+    const excludedFields = ['creator', 'created_at', 'client_id', 'id', 'user_id'];
+    const emptyFieldsToShow = ['start_date', 'end_Date', 'photos', 'videos'];
     
     return Object.entries(log)
       .filter(([key]) => !excludedFields.includes(key))
@@ -39,9 +40,19 @@ export default function LogForm({ logs, clientName }: LogFormProps) {
           .map(word => word.charAt(0).toUpperCase() + word.slice(1))
           .join(' ');
         
-        return { key: formattedKey, value };
+        // Check if value is empty
+        const isEmpty = value === null || value === undefined || value === '';
+        
+        // Display empty message for specific fields
+        const displayValue = isEmpty && emptyFieldsToShow.includes(key)
+          ? 'None'
+          : isEmpty
+          ? null
+          : value;
+        
+        return { key: formattedKey, value: displayValue, originalKey: key };
       })
-      .filter(({ value }) => value !== null && value !== undefined && value !== '');
+      .filter(({ value }) => value !== null);
   };
 
   const handleLogSelect = (logTitle: string) => {
