@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 type ClientSectionProps = {
   clients: { id: string; name: string }[];
-  allLogs: { creator: string; created_at: string; client_id: string }[];
+  allLogs: Record<string, any>[]; // Changed to accept any log structure
 };
 
 export default function ClientSection({ clients = [], allLogs = [] }: ClientSectionProps) {
@@ -37,7 +37,7 @@ export default function ClientSection({ clients = [], allLogs = [] }: ClientSect
             <CardTitle>Select Logs for {selectedClient.name}</CardTitle>
           </CardHeader>
           <CardContent>
-            <LogForm logs={clientLogs} />
+            <LogForm logs={clientLogs} clientName={selectedClient.name} />
           </CardContent>
         </Card>
       )}

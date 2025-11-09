@@ -37,7 +37,7 @@ export default async function CreateReportPage() {
   // Get list of all logs with creator, created_at, and client_id
   const { data: allLogs, error: logsError } = await supabase
     .from('logs')
-    .select('creator, created_at, client_id');
+    .select('*');
 
   if (logsError) {
     console.error('Error fetching logs:', logsError);
