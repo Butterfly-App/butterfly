@@ -28,11 +28,17 @@ export default async function CreateReportPage() {
   // Get list of all clients with id and name
   const { data: clients, error: clientError } = await supabase
     .from('clients')
-    .select('id, name');
+    .select('id, first_name, last_name');
 
   if (clientError) {
     console.error('Error fetching clients:', clientError);
   }
+
+  const clientFullNames = clients?.map(c => ({
+    id: c.id,
+    name: `${c.first_name} ${c.last_name}`
+    })
+  ) || [];
 
   // Get list of all logs with creator, created_at, and client_id
   const { data: allLogs, error: logsError } = await supabase
@@ -43,7 +49,7 @@ export default async function CreateReportPage() {
     console.error('Error fetching logs:', logsError);
   }
 
-  const safeClients = clients || [];
+  const safeClients = clientFullNames || [];
   const safeAllLogs = allLogs || [];
 
   return (
@@ -85,7 +91,7 @@ export default async function CreateReportPage() {
             {safeClients.length === 0 && !clientError && (
               <p className="text-zinc-600 mb-4">No clients found.</p>
             )}
-            <ClientSection clients={safeClients} allLogs={safeAllLogs} />
+            <ClientSection clientFullNames={safeClients} allLogs={safeAllLogs} />
           </CardContent>
         </Card>         
       </div>
