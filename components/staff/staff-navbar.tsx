@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Users, ClipboardList, Calendar, FileText, BarChart3, BookOpen } from "lucide-react";
+import { Users, ClipboardList, Calendar, FileText, BarChart3, BookOpen, FileBarChart } from "lucide-react";
 
 const navItems = [
   {
@@ -30,6 +30,11 @@ const navItems = [
     title: "Appointments",
     href: "/dashboard/staff/appointments",
     icon: Calendar,
+  },
+  {
+    title: "Reports",
+    href: "/dashboard/staff/reports",
+    icon: FileBarChart,
   },
   {
     title: "Resources",
