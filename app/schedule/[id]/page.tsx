@@ -1,190 +1,124 @@
+// app/schedule/page.tsx
 'use client';
 
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useEffect, useMemo, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 
-type Sched = {
+import { Calendar, dateFnsLocalizer, Views, View } from 'react-big-calendar';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
+import enCA from 'date-fns/locale/en-CA';
+
+type ScheduleRow = {
   id: string;
   program: string | null;
   location: string | null;
-  notes: string | null;
-  start_time: string;  // ISO/timestamptz
-  end_time: string;    // ISO/timestamptz
-  client_id: string | null;
-  staff_id: string | null;
+  start_time: string;
+  end_time: string;
+  clients?: { name?: string | null } | null;
+  staff?: { name?: string | null } | null;
 };
 
-type Person = { id: string; name: string | null };
+const locales = { 'en-CA': enCA };
+const localizer = dateFnsLocalizer({
+  format,
+  parse: (dateStr: string, fmt: string) => parse(dateStr, fmt, new Date()),
+  startOfWeek: (date: Date) => startOfWeek(date, { weekStartsOn: 0 }),
+  getDay,
+  locales,
+});
 
-export default function ScheduleDetailPage() {
-  const { id } = useParams<{ id: string }>();
+export default function ScheduleCalendarPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  const [row, setRow] = useState<Sched | null>(null);
-  const [client, setClient] = useState<Person | null>(null);
-  const [staff, setStaff] = useState<Person | null>(null);
+  const [rows, setRows] = useState<ScheduleRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
 
-  // fetch the schedule row, then (optionally) fetch names
+  const [view, setView] = useState<View>(Views.WEEK);
+  const [date, setDate] = useState<Date>(new Date());
+
   useEffect(() => {
-    let cancelled = false;
-
     (async () => {
-      try {
-        // 1) get schedule row (no joins = works even without FKs)
-        const { data: sched, error } = await supabase
-          .from('schedule')
-          .select('id, program, location, notes, start_time, end_time, client_id, staff_id')
-          .eq('id', id)
-          .single();
-
-        if (error) throw error;
-        if (cancelled) return;
-        setRow(sched as Sched);
-
-        // 2) fetch names if present
-        if (sched?.client_id) {
-          const { data } = await supabase
-            .from('clients')
-            .select('id, name')
-            .eq('id', sched.client_id)
-            .single();
-          if (!cancelled) setClient(data as Person);
-        }
-        if (sched?.staff_id) {
-          const { data } = await supabase
-            .from('staff')
-            .select('id, name')
-            .eq('id', sched.staff_id)
-            .single();
-          if (!cancelled) setStaff(data as Person);
-        }
-      } catch (e: any) {
-        if (!cancelled) setErr(e?.message || 'Failed to load schedule');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id, supabase]);
-
-  async function updateField(field: keyof Sched, value: string | null) {
-    try {
-      setSaving(true);
-      setMsg(null);
-      setErr(null);
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('schedule')
-        .update({ [field]: value })
-        .eq('id', id);
-      if (error) throw error;
+        .select('id, program, location, start_time, end_time, clients(name), staff(name)')
+        .order('start_time', { ascending: true });
+      setRows(error ? [] : data || []);
+      setLoading(false);
+    })();
+  }, [supabase]);
 
-      // reflect locally
-      setRow((r) => (r ? { ...r, [field]: value } as Sched : r));
-      setMsg('✅ Saved');
-    } catch (e: any) {
-      setErr(e?.message || 'Save failed');
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  const startText = useMemo(
-    () => (row?.start_time ? new Date(row.start_time).toLocaleString() : '—'),
-    [row?.start_time]
+  const events = useMemo(
+    () =>
+      rows.map((r) => ({
+        id: r.id,
+        title:
+          `${r.program ?? 'Session'}` +
+          (r.clients?.name ? ` • ${r.clients?.name}` : '') +
+          (r.location ? ` @ ${r.location}` : ''),
+        start: new Date(r.start_time),
+        end: new Date(r.end_time),
+        resource: r,
+      })),
+    [rows]
   );
-  const endText = useMemo(
-    () => (row?.end_time ? new Date(row.end_time).toLocaleString() : '—'),
-    [row?.end_time]
-  );
 
-  if (loading) return <div className="p-6">Loading…</div>;
-
-  if (err) {
+  function EventProp({ event }: any) {
+    const client = event.resource?.clients?.name ?? '';
+    const loc = event.resource?.location ?? '';
     return (
-      <div className="max-w-xl mx-auto p-6 space-y-3">
-        <h1 className="text-2xl font-semibold">Session Details</h1>
-        <p className="text-red-600 text-sm">Error: {err}</p>
-        <button
-          className="rounded bg-gray-200 px-3 py-2"
-          onClick={() => router.push('/schedule')}
-        >
-          ← Back
-        </button>
-      </div>
-    );
-  }
-
-  if (!row) {
-    return (
-      <div className="p-6">
-        Not found
-        <div className="mt-3">
-          <button className="rounded bg-gray-200 px-3 py-2" onClick={() => router.push('/schedule')}>
-            ← Back
-          </button>
+      <div className="leading-tight">
+        <div className="font-medium">{event.title}</div>
+        <div className="text-xs opacity-80">
+          {client ? `Client: ${client}` : ''}{client && loc ? ' · ' : ''}{loc}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-xl mx-auto p-6 space-y-4">
-      <h1 className="text-2xl font-semibold">Session Details</h1>
-
-      <div className="text-sm text-gray-600">
-        <div><span className="font-medium">Client:</span> {client?.name ?? '—'}</div>
-        <div><span className="font-medium">Staff:</span> {staff?.name ?? '—'}</div>
+    <div className="p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Schedule</h1>
+        <Link
+          href="/schedule/new"
+          className="rounded bg-blue-600 px-3 py-2 text-white hover:bg-blue-700"
+        >
+          + New
+        </Link>
       </div>
 
-      <label className="block">
-        <span className="text-sm">Program</span>
-        <input
-          className="w-full border p-2 rounded"
-          defaultValue={row.program ?? ''}
-          onBlur={(e) => updateField('program', e.target.value || null)}
-        />
-      </label>
-
-      <label className="block">
-        <span className="text-sm">Location</span>
-        <input
-          className="w-full border p-2 rounded"
-          defaultValue={row.location ?? ''}
-          onBlur={(e) => updateField('location', e.target.value || null)}
-        />
-      </label>
-
-      <label className="block">
-        <span className="text-sm">Notes</span>
-        <textarea
-          className="w-full border p-2 rounded"
-          rows={3}
-          defaultValue={row.notes ?? ''}
-          onBlur={(e) => updateField('notes', e.target.value || null)}
-        />
-      </label>
-
-      <div className="text-sm">
-        <div><span className="font-medium">Start:</span> {startText}</div>
-        <div><span className="font-medium">End:</span> {endText}</div>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <button className="rounded bg-gray-200 px-3 py-2" onClick={() => router.push('/schedule')}>
-          ← Back
-        </button>
-        {saving && <span className="text-xs">Saving…</span>}
-        {msg && <span className="text-xs">{msg}</span>}
-      </div>
+      {loading ? (
+        <p>Loading…</p>
+      ) : (
+        <div style={{ height: '75vh' }}>
+          <Calendar
+            localizer={localizer}
+            events={events}
+            view={view}
+            date={date}
+            onView={(v) => setView(v)}
+            onNavigate={(d) => setDate(d)}
+            views={[Views.DAY, Views.WEEK, Views.MONTH, Views.AGENDA]}
+            step={30}
+            timeslots={2}
+            popup
+            selectable
+            components={{ event: EventProp }}
+            onSelectEvent={(e) => router.push(`/schedule/${e.id}`)}
+            onSelectSlot={({ start, end }) => {
+              const qs = new URLSearchParams({
+                start_time: start.toISOString(),
+                end_time: end.toISOString(),
+              });
+              router.push(`/schedule/new?${qs.toString()}`);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
