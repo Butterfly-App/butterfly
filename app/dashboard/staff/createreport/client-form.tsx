@@ -3,19 +3,24 @@ import { useState } from "react";
 
 type ClientFormProps = {
   clientnames: { name: string }[];
+  onClientSelect: (clientName: string) => void; // New prop
 };
 
-export default function ClientForm({ clientnames }: ClientFormProps) {
+export default function ClientForm({ clientnames, onClientSelect }: ClientFormProps) {
   const [selectedClient, setSelectedClient] = useState("");
 
   const handleClientSelect = (clientName: string) => {
     setSelectedClient(clientName);
+    onClientSelect(clientName); 
   };
 
   return (
     <div className="w-full mt-8">
       <h2 className="text-xl font-semibold mb-4">Client List</h2>
       <form className="space-y-2">
+        {(!clientnames || clientnames.length === 0) && (
+          <p className="text-sm text-zinc-600">No clients available.</p>
+        )}
         {clientnames?.map((client) => (
           <div key={client.name} className="flex items-center space-x-2">
             <input
