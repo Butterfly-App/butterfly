@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getUserRole } from "@/lib/auth/roles-server";
-import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
+
 import { StaffNavbar } from "@/components/staff/staff-navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
@@ -85,6 +85,6 @@ export default async function ReportsPage() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    
   );
 }

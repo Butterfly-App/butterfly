@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getUserRole } from "@/lib/auth/roles-server";
-import { AdminNavbar } from "@/components/admin/admin-navbar";
-import { AdminUsersSection } from "@/components/admin/admin-users-section";
 
-export default async function AdminUsersPage() {
+import { AdminNavbar } from "@/components/admin/admin-navbar";
+import { SchedulesPageClient } from "./schedules-page-client";
+
+export default async function AdminSchedulesPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -22,20 +23,18 @@ export default async function AdminUsersPage() {
   }
 
   return (
-
+    <DashboardLayout
+      userEmail={user.email!}
+      userRole="admin"
+      title="Schedule Management"
+    >
       <div className="space-y-6">
         <AdminNavbar />
 
         <div className="px-6">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold tracking-tight">User Management</h2>
-            <p className="text-zinc-600 dark:text-zinc-400">
-              Manage all users, guardians, staff, and administrators in the system.
-            </p>
-          </div>
-
-          <AdminUsersSection />
+          <SchedulesPageClient />
         </div>
       </div>
+    
   );
 }

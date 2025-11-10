@@ -3,9 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { getUserRole } from "@/lib/auth/roles-server";
 
 import { StaffNavbar } from "@/components/staff/staff-navbar";
-import { StaffUsersSection } from "@/components/staff/staff-users-section";
+import { SchedulesPageClient } from "./schedules-page-client";
 
-export default async function UsersPage() {
+export default async function StaffSchedulesPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -16,7 +16,6 @@ export default async function UsersPage() {
   const role = await getUserRole();
 
   if (role !== "staff" && role !== "admin") {
-    // Redirect to appropriate dashboard based on role
     if (role === "guardian") redirect("/dashboard/guardian");
     if (role === "user") redirect("/dashboard/user");
     redirect("/login");
@@ -27,14 +26,7 @@ export default async function UsersPage() {
         <StaffNavbar />
 
         <div className="px-6">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold tracking-tight">User Management</h2>
-            <p className="text-zinc-600 dark:text-zinc-400">
-              Manage users and guardians in the system.
-            </p>
-          </div>
-
-          <StaffUsersSection />
+          <SchedulesPageClient />
         </div>
       </div>
     
