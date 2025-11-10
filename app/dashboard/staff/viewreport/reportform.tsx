@@ -78,12 +78,12 @@ export default function ReportForm({ clientReports = [] }: ReportFormProps) {
 
             {selectedReport && (
                 <div className="flex space-x-2 mt-4"> 
-                    <Button onClick={() => window.open(selectedReport?.document_url, '_blank')}>
-                    View
+                    <Button onClick={() => window.open(selectedReport.document_url, '_blank')}>
+                        View
                     </Button>
                     
                     <Button variant="destructive" onClick={onDelete}>
-                    Delete
+                        Delete
                     </Button>
 
                     <Button variant="outline" onClick={handleEdit}>
@@ -94,8 +94,4 @@ export default function ReportForm({ clientReports = [] }: ReportFormProps) {
             
         </div>
     )
-
 }
-
-
-
