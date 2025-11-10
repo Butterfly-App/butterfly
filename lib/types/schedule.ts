@@ -16,10 +16,15 @@ export interface ScheduleParticipant {
   schedule_id: string;
   user_id: string;
   created_at: string;
+  clients: {
+    first_name: string;
+    last_name: string;
+  }
 }
 
 export interface AssignedStaffProfile {
   user_id: string;
+  full_name: string;
   email: string;
   role: string;
 }
