@@ -51,7 +51,7 @@ export default function ClientLandmarksMap({ points }: { points: Point[] }) {
 
   useEffect(() => {
     if (!ready || !mapRef.current || points.length === 0) return;
-    const L = (window as any).L as typeof import('leaflet');
+    const L: any = (window as any).L; // <— no type import; avoid build error
 
     // Create map
     const map = L.map(mapRef.current, {
@@ -106,7 +106,6 @@ export default function ClientLandmarksMap({ points }: { points: Point[] }) {
     <div
       ref={mapRef}
       className="h-80 w-full bg-zinc-100 dark:bg-zinc-800"
-      // tweak height with h-64/h-96 if desired
     />
   );
 }
