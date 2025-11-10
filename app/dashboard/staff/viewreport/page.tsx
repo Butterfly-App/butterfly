@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-import viewReportSection from "./viewreportsection";
+import ViewReportSection from "./viewreportsection";
 
 
 export default async function ViewReportPage() {
@@ -88,7 +88,7 @@ export default async function ViewReportPage() {
               <CardDescription>Select a report to view details</CardDescription>
             </CardHeader>
             <CardContent>
-              {/* <viewReportSection clientData={clientData} allReportData={allReportData} /> */}
+              <ViewReportSection clientData={clientData} allReportData={allReportData} />
             </CardContent>
           </Card>
         </div>

@@ -2,14 +2,14 @@
 import { useState } from "react";
 import ClientForm from "@/app/dashboard/staff/createreport/client-form";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import ReportForm from "./reportform";
+import ReportForm, {type reports} from "./reportform";
 
 type ReportSectionProps = {
   clientData: { id: string; name: string }[];
-  allReportData: Record<string, any>[];
+  allReportData: reports[];
 };
 
-export default function viewReportSection({ clientData = [], allReportData = [] }: ReportSectionProps) {
+export default function ViewReportSection({ clientData = [], allReportData = [] }: ReportSectionProps) {
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   
   // Find the selected client to display the name
@@ -37,7 +37,7 @@ export default function viewReportSection({ clientData = [], allReportData = [] 
             <CardTitle>Select a Report for {selectedClient.name}</CardTitle>
           </CardHeader>
           <CardContent>
-                {/* <ReportForm clientReports={clientReports} /> */}
+                <ReportForm clientReports={clientReports} />
           </CardContent>
         </Card>
       )}

@@ -26,7 +26,7 @@ export default function LogForm({ logs, clientName, clientID}: LogFormProps) {
       hour: '2-digit',
       minute: '2-digit'
     });
-    return `${log.creator} - ${formattedDate}`;
+    return `${log.name} - ${formattedDate}`;
   };
 
   // Format log content excluding title fields
