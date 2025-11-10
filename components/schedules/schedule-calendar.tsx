@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, dateFnsLocalizer, Event } from "react-big-calendar";
+import { Calendar, dateFnsLocalizer, Event, View } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -23,8 +23,8 @@ interface ScheduleCalendarProps {
   onSelectEvent?: (event: CalendarEvent) => void;
   onSelectSlot?: (slotInfo: { start: Date; end: Date }) => void;
   selectable?: boolean;
-  view?: "month" | "week" | "day" | "agenda";
-  onViewChange?: (view: "month" | "week" | "day" | "agenda") => void;
+  view?: View;
+  onViewChange?: (view: View) => void;
 }
 
 export function ScheduleCalendar({
