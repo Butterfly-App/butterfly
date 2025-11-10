@@ -1,6 +1,7 @@
 'use client';
 import { useTransition } from 'react';
 import { createLogAction } from '@/app/dashboard/staff/logs/actions';
+import { AddressPicker } from '@/components/maps/AddressPicker';
 
 export function NewLogForm({ clients }: { clients: { id: string; name: string }[] }) {
   const [pending, startTransition] = useTransition();
@@ -23,7 +24,7 @@ export function NewLogForm({ clients }: { clients: { id: string; name: string }[
         ))}
       </select>
 
-            <label className="mt-2 text-sm font-medium">Your name</label>
+      <label className="mt-2 text-sm font-medium">Your name</label>
       <input
         type="text"
         name="name"
@@ -31,7 +32,6 @@ export function NewLogForm({ clients }: { clients: { id: string; name: string }[
         placeholder="e.g., Raiyana Rahman"
         required
       />
-
 
       <label className="mt-2 text-sm font-medium">Daily Note</label>
       <textarea
@@ -41,6 +41,11 @@ export function NewLogForm({ clients }: { clients: { id: string; name: string }[
         placeholder="What did the client do today?"
         required
       />
+
+      {/* Google Places picker (fills hidden fields for address + lat/lng) */}
+      <div className="mt-2">
+        <AddressPicker />
+      </div>
 
       <div className="mt-2">
         <button
