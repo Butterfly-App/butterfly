@@ -152,6 +152,7 @@ export default function LogForm({ logs, clientName, clientID}: LogFormProps) {
           client_id: clientID,
           title: filename,
           document_url: documentUrl,
+          content: reportText
         },
       ])
 

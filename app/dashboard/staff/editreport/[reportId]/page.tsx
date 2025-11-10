@@ -11,26 +11,27 @@ import { getUserRole } from "@/lib/auth/roles-server";
 export default async function EditReportPage({ params }: { params: { reportId: string } }) {
     const supabase = await createClient();
 
-    // const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    // if (!user) {
-    //     redirect("/login");
-    // }
+    if (!user) {
+        redirect("/login");
+    }
 
-    // const role = await getUserRole();
+    const role = await getUserRole();
 
-    // if (role !== "staff" && role !== "admin") {
-    //     // Redirect to appropriate dashboard based on role
-    //     if (role === "guardian") redirect("/dashboard/guardian");
-    //     if (role === "user") redirect("/dashboard/user");
-    //     redirect("/login");
-    // }
+    if (role !== "staff" && role !== "admin") {
+        if (role === "guardian") redirect("/dashboard/guardian");
+        if (role === "user") redirect("/dashboard/user");
+        redirect("/login");
+    }
 
+    console.log("USER ROLE IS:", role);
+    console.log("FETCHING REPORT ID:", params.reportId);
 
     const { data: report, error } = await supabase
         .from('reports')
         .select('*')
-        .eq('id', parseInt(params.reportId, 10))
+        .eq('id', params.reportId)
         .single();
     if (error) {
         console.error("Error fetching report:", error);

@@ -45,7 +45,7 @@ export default async function ViewReportPage() {
   // Get list of all reports
   const { data: allReports, error } = await supabase
     .from('reports')
-    .select('id, client_id, title, document_url');
+    .select('id, client_id, title, document_url, content');
 
   if (error) {
     console.error('Error fetching reports:', error);
@@ -57,6 +57,7 @@ export default async function ViewReportPage() {
     client_id: r.client_id,
     title: r.title,
     document_url: r.document_url,
+    content: r.content,
   })) || [];
 
   return (

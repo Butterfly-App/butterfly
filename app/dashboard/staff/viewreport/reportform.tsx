@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
-export type reports = { id: string; title: string; document_url: string; client_id: string };
+export type reports = { id: string; title: string; document_url: string; client_id: string, content: string };
 
 type ReportFormProps = {
     clientReports: reports[]
@@ -15,9 +15,7 @@ export default function ReportForm({ clientReports = [] }: ReportFormProps) {
     const [selectedReport, setSelectedReport] = useState<reports | null>(null);
 
     const handleReportSelect = (reportId: string) => {
-        console.log("CLICKED REPORT ID:", reportId);
         const report = clientReports.find(r => String(r.id) === reportId);
-        console.log("FOUND REPORT OBJECT:", report);
         setSelectedReport(report || null);
     }
 
