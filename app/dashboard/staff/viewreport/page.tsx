@@ -7,7 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import ReportForm from "./report-form";
+
+import viewReportSection from "./viewreportsection";
+
 
 export default async function ViewReportPage() {
   const supabase = await createClient();
@@ -25,14 +27,37 @@ export default async function ViewReportPage() {
     redirect("/login");
   }
 
+  // Get list of all clients with their id and name
+  const { data: clients, error: clientError } = await supabase
+    .from("clients")
+    .select("id, first_name, last_name");
+
+  if (clientError) {
+    console.error("Error fetching clients:", clientError);
+  }
+
+  const clientData =
+    clients?.map((c) => ({
+      id: c.id,
+      name: `${c.first_name} ${c.last_name}`,
+    })) || [];
+
   // Get list of all reports
-  const { data: reporttitles, error } = await supabase
+  const { data: allReports, error } = await supabase
     .from('reports')
-    .select('title');
+    .select('id, client_id, title, document_url');
 
   if (error) {
     console.error('Error fetching reports:', error);
   }
+
+  const allReportData =
+  allReports?.map((r) => ({
+    id: r.id,
+    client_id: r.client_id,
+    title: r.title,
+    document_url: r.document_url,
+  })) || [];
 
   return (
 
@@ -63,7 +88,7 @@ export default async function ViewReportPage() {
               <CardDescription>Select a report to view details</CardDescription>
             </CardHeader>
             <CardContent>
-              <ReportForm reporttitles={reporttitles || []} />
+              <viewReportSection clientData={clientData} allReportData={allReportData} />
             </CardContent>
           </Card>
         </div>

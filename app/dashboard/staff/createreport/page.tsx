@@ -44,7 +44,7 @@ export default async function CreateReportPage() {
 
   // Get list of all logs
   const { data: allLogs, error: logsError } = await supabase
-    .from("logs")
+    .from("log_notes")
     .select("*");
 
   if (logsError) {

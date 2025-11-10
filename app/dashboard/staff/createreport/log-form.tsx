@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import jsPDF from 'jspdf';
-import { title } from "process";
 
 type LogFormProps = {
   logs: Record<string, any>[]; 
@@ -32,8 +31,7 @@ export default function LogForm({ logs, clientName, clientID}: LogFormProps) {
 
   // Format log content excluding title fields
   const formatLogContent = (log: Record<string, any>) => {
-    const excludedFields = ['creator', 'created_at', 'client_id', 'id', 'user_id'];
-    // const emptyFieldsToShow = ['start_date', 'end_Date', 'photos', 'videos'];
+    const excludedFields = ['creator', 'author_id','created_at', 'client_id', 'id', 'user_id'];
     
     return Object.entries(log)
       .filter(([key]) => !excludedFields.includes(key))
@@ -48,7 +46,6 @@ export default function LogForm({ logs, clientName, clientID}: LogFormProps) {
         const isEmpty = value === null || value === undefined || value === '';
         
         // Display empty message for specific fields
-        // const displayValue = isEmpty && emptyFieldsToShow.includes(key)
         const displayValue = isEmpty
           ? 'None'
           : isEmpty
@@ -57,7 +54,6 @@ export default function LogForm({ logs, clientName, clientID}: LogFormProps) {
         
         return { key: formattedKey, value: displayValue, originalKey: key };
       })
-      // .filter(({ value }) => value !== null);
   };
 
   const handleLogSelect = (logTitle: string) => {
