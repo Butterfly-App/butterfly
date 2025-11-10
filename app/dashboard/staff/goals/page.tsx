@@ -21,6 +21,8 @@ export default async function GoalsPage({
   searchParams: { clientId?: string };
 }) {
   const supabase = await createClient();
+  const params = await searchParams; 
+
 
   // Get list of clients
   const { data: clients } = await supabase
