@@ -1,11 +1,12 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import { fetchRevisions } from '@/app/dashboard/staff/logs/actions';
-
 
 type Revision = {
   version: number;
   editor_id: string;
+  name?: string;
   content: string;
   edited_at: string;
 };
@@ -59,7 +60,7 @@ export function ViewHistory({ logId }: { logId: string }) {
                       <div className="text-xs text-zinc-600 dark:text-zinc-400">
                         <span className="font-medium">v{r.version}</span>
                         <span className="mx-2">·</span>
-                        <span>Editor: {r.editor_id}</span>
+                        <span>Editor: {r.name ?? r.editor_id}</span>
                         <span className="mx-2">·</span>
                         <span>{new Date(r.edited_at).toLocaleString()}</span>
                       </div>

@@ -23,6 +23,16 @@ export function NewLogForm({ clients }: { clients: { id: string; name: string }[
         ))}
       </select>
 
+            <label className="mt-2 text-sm font-medium">Your name</label>
+      <input
+        type="text"
+        name="name"
+        className="w-full rounded-lg border border-zinc-300 bg-white p-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950"
+        placeholder="e.g., Raiyana Rahman"
+        required
+      />
+
+
       <label className="mt-2 text-sm font-medium">Daily Note</label>
       <textarea
         name="content"
