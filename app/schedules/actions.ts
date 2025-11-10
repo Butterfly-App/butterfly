@@ -45,34 +45,35 @@ export async function getSchedules(): Promise<{
     }
 
     // Fetch participants and assigned staff for each schedule
-    const schedulesWithParticipants: ScheduleWithParticipants[] = await Promise.all(
-      schedules.map(async (schedule) => {
-        const { data: participants } = await supabase
-          .from("schedule_participants")
-          .select("*")
-          .eq("schedule_id", schedule.id);
+    const schedulesWithParticipants: ScheduleWithParticipants[] =
+      await Promise.all(
+        schedules.map(async (schedule) => {
+          const { data: participants } = await supabase
+            .from("schedule_participants")
+            .select("*")
+            .eq("schedule_id", schedule.id);
 
-        // Fetch assigned staff profile if exists
-        let assignedStaff = null;
-        if (schedule.assigned_staff_id) {
-          const { data: staffProfile } = await supabase
-            .from("profiles")
-            .select("user_id, email, role")
-            .eq("user_id", schedule.assigned_staff_id)
-            .single();
+          // Fetch assigned staff profile if exists
+          let assignedStaff = null;
+          if (schedule.assigned_staff_id) {
+            const { data: staffProfile } = await supabase
+              .from("profiles")
+              .select("user_id, email, role")
+              .eq("user_id", schedule.assigned_staff_id)
+              .single();
 
-          if (staffProfile) {
-            assignedStaff = staffProfile;
+            if (staffProfile) {
+              assignedStaff = staffProfile;
+            }
           }
-        }
 
-        return {
-          ...schedule,
-          participants: participants || [],
-          assigned_staff: assignedStaff,
-        };
-      })
-    );
+          return {
+            ...schedule,
+            participants: participants || [],
+            assigned_staff: assignedStaff,
+          };
+        })
+      );
 
     return { data: schedulesWithParticipants };
   } catch (error) {
@@ -113,8 +114,13 @@ export async function createSchedule(input: CreateScheduleInput): Promise<{
       return { error: "End time must be after start time" };
     }
 
-    if (!input.is_all_users && (!input.participant_ids || input.participant_ids.length === 0)) {
-      return { error: "Please select at least one participant for individual events" };
+    if (
+      !input.is_all_users &&
+      (!input.participant_ids || input.participant_ids.length === 0)
+    ) {
+      return {
+        error: "Please select at least one participant for individual events",
+      };
     }
 
     // Create schedule
@@ -138,7 +144,11 @@ export async function createSchedule(input: CreateScheduleInput): Promise<{
     }
 
     // If not all users, create participant records
-    if (!input.is_all_users && input.participant_ids && input.participant_ids.length > 0) {
+    if (
+      !input.is_all_users &&
+      input.participant_ids &&
+      input.participant_ids.length > 0
+    ) {
       const participants = input.participant_ids.map((userId) => ({
         schedule_id: schedule.id,
         user_id: userId,
@@ -202,10 +212,15 @@ export async function deleteSchedule(scheduleId: string): Promise<{
  * Accessible by staff and admin roles
  */
 export async function getAllUsers(): Promise<{
-  data?: Array<{ id: string; first_name: string; last_name: string; guardian: {
+  data?: Array<{
     id: string;
-    full_name: string;
-  } }>;
+    first_name: string;
+    last_name: string;
+    guardian: {
+      id: string | null;
+      full_name: string | null;
+    } | null;
+  }>;
   error?: string;
 }> {
   try {
@@ -217,7 +232,8 @@ export async function getAllUsers(): Promise<{
     // Fetch all users from profiles table
     const { data: profiles, error: profilesError } = await supabase
       .from("clients")
-      .select(`
+      .select(
+        `
         id,
         first_name,
         last_name,
@@ -225,7 +241,8 @@ export async function getAllUsers(): Promise<{
           id,
           full_name
         )
-      `)
+      `
+      )
       .order("first_name", { ascending: true });
 
     if (profilesError) {
@@ -234,15 +251,16 @@ export async function getAllUsers(): Promise<{
     }
 
     // Map to expected format
-    const users = profiles?.map((profile) => ({
-      id: profile.id,
-      first_name: profile.first_name,
-      last_name: profile.last_name,
-      guardian: {
-        id: profile.profiles?.id,
-        full_name: profile.profiles?.full_name
-      }
-    })) || [];
+    const users =
+      profiles?.map((profile) => ({
+        id: profile.id,
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        guardian: {
+          id: profile.profiles?.id,
+          full_name: profile.profiles?.full_name,
+        },
+      })) || [];
 
     return { data: users };
   } catch (error) {
@@ -278,11 +296,12 @@ export async function getStaffUsers(): Promise<{
     }
 
     // Map to expected format
-    const users = profiles?.map((profile) => ({
-      id: profile.user_id,
-      email: profile.email,
-      role: profile.role,
-    })) || [];
+    const users =
+      profiles?.map((profile) => ({
+        id: profile.user_id,
+        email: profile.email,
+        role: profile.role,
+      })) || [];
 
     return { data: users };
   } catch (error) {

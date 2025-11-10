@@ -32,9 +32,9 @@ interface Client {
   first_name: string;
   last_name: string;
   guardian: {
-    id: string;
-    full_name: string;
-  }
+    id: string | null;
+    full_name: string | null;
+  } | null;
 }
 
 export function ScheduleForm({
@@ -250,7 +250,7 @@ export function ScheduleForm({
                       />
                       <span className="text-sm">
                         {user.first_name}{" "}{user.last_name} {" "}
-                        <span className="text-gray-500">Guardian: {user.guardian.full_name}</span>
+                        <span className="text-gray-500">Guardian: {user.guardian?.full_name}</span>
                       </span>
                     </label>
                   ))
