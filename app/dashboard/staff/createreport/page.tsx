@@ -38,24 +38,30 @@ export default async function CreateReportPage() {
     .from("clients")
     .select("id, first_name, last_name");
 
-  if (clientError) {
-    console.error("Error fetching clients:", clientError);
-  }
-
   const clientFullNames =
     clients?.map((c) => ({
       id: c.id,
-      name: `${c.first_name} ${c.last_name}`,
+      name: `${c.first_name ?? ""} ${c.last_name ?? ""}`.trim(),
     })) || [];
 
-  // Get list of all logs with creator, created_at, and client_id
-  const { data: allLogs, error: logsError } = await supabase
-    .from("logs")
-    .select("*");
+  // 🔁 NEW: Use your new logs table (log_notes) instead of old "logs"
+  const { data: logNotes, error: logsError } = await supabase
+    .from("log_notes")
+    .select(
+      // include anything you want available in the report UI
+      "id, client_id, name, content, latitude, longitude, place_name, place_address, created_at, updated_at, author_id"
+    )
+    .order("created_at", { ascending: false });
 
-  if (logsError) {
-    console.error("Error fetching logs:", logsError);
-  }
+  // Shape to what your existing components expect:
+  // - LogForm expects `creator` and `created_at` for titles
+  // - Keep all other fields as-is so they render in the report body
+  const allLogs =
+    (logNotes ?? []).map((l) => ({
+      ...l,
+      creator: l.name ?? "—", // map author snapshot to old "creator"
+      user_id: l.author_id ?? null, // if your old UI referenced it
+    })) ?? [];
 
   const safeClients = clientFullNames || [];
   const safeAllLogs = allLogs || [];
@@ -82,12 +88,11 @@ export default async function CreateReportPage() {
           </div>
         </div>
       </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Select Client</CardTitle>
-          <CardDescription>
-            Choose a client to create a report for
-          </CardDescription>
+          <CardDescription>Choose a client to create a report for</CardDescription>
         </CardHeader>
         <CardContent>
           {clientError && (

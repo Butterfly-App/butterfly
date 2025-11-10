@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { fetchRevisions } from '@/app/dashboard/staff/logs/actions';
+import { diffWords } from 'diff'; // ← added
 
 type Revision = {
   version: number;
@@ -74,7 +75,8 @@ export function ViewHistory({ logId }: { logId: string }) {
   }, [open, logId]);
 
   function renderDiff(curr: string, prev: string) {
-    const parts = diffWordsLite(prev ?? '', curr ?? '');
+    // ← now using the real 'diff' library
+    const parts = diffWords(prev ?? '', curr ?? '');
     return (
       <div className="text-sm leading-relaxed">
         {parts.map((p, i) => {
