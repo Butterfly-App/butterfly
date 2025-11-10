@@ -44,7 +44,9 @@ export default async function GoalsPage({ params }: { params: Params }) {
           a reason is required.
         </p>
         <div className="mt-4">
-          <NewGoalForm clientId={id} domains={DOMAINS} reasons={REASONS} />
+          <NewGoalForm   clientId={id}
+  domains={[...DOMAINS]}
+  reasons={[...REASONS]} />
         </div>
       </section>
 
@@ -61,9 +63,9 @@ export default async function GoalsPage({ params }: { params: Params }) {
                 key={g.id}
                 clientId={id}
                 goal={g}
-                subgoals={subMap.get(g.id) ?? []}
-                reasons={REASONS}
-                domains={DOMAINS}
+                  subgoals={subMap.get(g.id) ?? []}
+  reasons={[...REASONS]}
+  domains={[...DOMAINS]}
               />
             ))}
           </div>
