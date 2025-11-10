@@ -4,46 +4,77 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server'; // your existing helper
 import { z } from 'zod';
 
+
 const CreateLogSchema = z.object({
   clientId: z.string().uuid(),
+  name: z.string().min(1),
   content: z.string().min(1),
+  latitude: z.preprocess(
+    (v) => (v === null || v === '' ? undefined : v),
+    z.coerce.number().optional()
+  ),
+  longitude: z.preprocess(
+    (v) => (v === null || v === '' ? undefined : v),
+    z.coerce.number().optional()
+  ),
+  place_name: z.preprocess(
+    (v) => (v == null || String(v).trim() === '' ? undefined : v),
+    z.string().optional()
+  ),
+  place_address: z.preprocess(
+    (v) => (v == null || String(v).trim() === '' ? undefined : v),
+    z.string().optional()
+  ),
 });
 
+
+// createLogAction: keep your code, just align revalidations + add a debug line (optional)
 export async function createLogAction(formData: FormData) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  const parsed = CreateLogSchema.safeParse({
+  const parsed = CreateLogSchema.parse({
     clientId: formData.get('clientId'),
+    name: formData.get('name'),
     content: formData.get('content'),
+    latitude: formData.get('latitude'),
+    longitude: formData.get('longitude'),
+    place_name: formData.get('place_name'),
+    place_address: formData.get('place_address'),
   });
-  if (!parsed.success) throw new Error('Invalid input');
 
-  const { clientId, content } = parsed.data;
+  const { clientId, name, content, latitude, longitude, place_name, place_address } = parsed;
 
   const { error } = await supabase.from('log_notes').insert({
     client_id: clientId,
     author_id: user.id,
+    name,
     content,
+    latitude,
+    longitude,
+    place_name,
+    place_address,
   });
   if (error) throw error;
 
-  revalidatePath('/logs');
+  // optional: verify arriving values once during testing
+  // console.log('createLogAction parsed:', parsed);
+
+  // ✅ align with your routes
+  revalidatePath(`/dashboard/staff/clients/${clientId}`);
+  revalidatePath('/dashboard/staff/logs');
 }
+
 
 const UpdateLogSchema = z.object({
   logId: z.string().uuid(),
   content: z.string().min(1),
 });
-
+// updateLogAction: align revalidations to your dashboard routes
 export async function updateLogAction(prevState: unknown, formData: FormData) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
   const parsed = UpdateLogSchema.safeParse({
@@ -54,16 +85,14 @@ export async function updateLogAction(prevState: unknown, formData: FormData) {
 
   const { logId, content } = parsed.data;
 
-  // Updating content triggers the DB revision trigger
   const { error } = await supabase
     .from('log_notes')
     .update({ content })
     .eq('id', logId);
-
   if (error) throw error;
 
-  revalidatePath(`/logs/${logId}`);
-  revalidatePath('/logs');
+  // If you know the client id, you can also revalidate that client page.
+  revalidatePath('/dashboard/staff/logs');
 }
 
 export async function fetchRevisions(logId: string) {

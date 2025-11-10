@@ -4,10 +4,17 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server'; // your existing helper
 import { z } from 'zod';
 
+// in actions.ts
 const CreateLogSchema = z.object({
   clientId: z.string().uuid(),
+  name: z.string().min(1),
   content: z.string().min(1),
+  latitude: z.preprocess((v) => (v === null || v === '' ? undefined : v), z.coerce.number().optional()),
+  longitude: z.preprocess((v) => (v === null || v === '' ? undefined : v), z.coerce.number().optional()),
+  place_name: z.preprocess((v) => (v == null || String(v).trim() === '' ? undefined : v), z.string().optional()),
+  place_address: z.preprocess((v) => (v == null || String(v).trim() === '' ? undefined : v), z.string().optional()),
 });
+
 
 export async function createLogAction(formData: FormData) {
   const supabase = await createClient();
