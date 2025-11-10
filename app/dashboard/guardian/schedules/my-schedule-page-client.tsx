@@ -29,6 +29,7 @@ export function MySchedulePageClient() {
             description: schedule.description,
             is_all_users: schedule.is_all_users,
             created_by: schedule.created_by,
+            assigned_staff_id: schedule.assigned_staff_id,
           },
         }));
         setEvents(calendarEvents);
