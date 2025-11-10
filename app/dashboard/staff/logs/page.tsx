@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { DashboardLayout } from '@/components/dashboard/dashboard-layout'; // adjust path if needed
 import { NewLogForm } from '@/components/logs/NewLogForm';
 import { EditLogForm } from '@/components/logs/EditLogForm';
 import { ViewHistory } from '@/components/logs/ViewHistory';
@@ -23,11 +22,7 @@ export default async function LogsPage() {
   const clientMap = new Map(clients.map(c => [c.id, c.name]));
 
   return (
-    <DashboardLayout
-      title="Daily Logs"
-      userEmail={user?.email ?? ''}
-      userRole={role}
-    >
+    <>
       {/* Inner container to avoid spanning the full dashboard width */}
       <div className="mx-auto max-w-5xl space-y-8">
         {/* Create Log */}
@@ -89,6 +84,6 @@ export default async function LogsPage() {
           )}
         </section>
       </div>
-    </DashboardLayout>
+    </>
   );
 }
