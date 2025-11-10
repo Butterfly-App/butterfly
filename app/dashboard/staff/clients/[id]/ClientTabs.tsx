@@ -11,6 +11,7 @@ export function ClientTabs({ id, base = '/dashboard/staff/clients' }: { id: stri
     { href: `${base}/${id}/timeline`, label: 'Timeline' },
     { href: `${base}/${id}/calendar`, label: 'Calendar' },
     { href: `${base}/${id}/community`, label: 'Community' },
+    { href: `${base}/${id}/goals`, label: 'Goals' }, 
   ];
 
   return (
