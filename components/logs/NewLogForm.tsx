@@ -9,12 +9,12 @@ export function NewLogForm({ clients }: { clients: { id: string; name: string }[
   return (
     <form
       action={(formData) => startTransition(() => createLogAction(formData))}
-      className="space-y-3"
+      className="grid gap-3"
     >
-      <label className="block text-sm font-medium">Client</label>
+      <label className="text-sm font-medium">Client</label>
       <select
         name="clientId"
-        className="w-full rounded border p-2"
+        className="w-full rounded-lg border border-zinc-300 bg-white p-2 text-sm outline-none ring-0 focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950"
         required
         defaultValue=""
       >
@@ -24,24 +24,24 @@ export function NewLogForm({ clients }: { clients: { id: string; name: string }[
         ))}
       </select>
 
-      <label className="block text-sm font-medium mt-2">Daily Note</label>
+      <label className="mt-2 text-sm font-medium">Daily Note</label>
       <textarea
         name="content"
-        className="w-full rounded border p-2"
+        className="w-full rounded-lg border border-zinc-300 bg-white p-3 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950"
         rows={6}
         placeholder="What did the client do today?"
         required
       />
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
-      >
-        {pending ? 'Saving…' : 'Create Log'}
-      </button>
-
-      {/* Auto-timestamp & author: set by DB and session; no inputs needed */}
+      <div className="mt-2">
+        <button
+          type="submit"
+          disabled={pending}
+          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
+        >
+          {pending ? 'Saving…' : 'Create Log'}
+        </button>
+      </div>
     </form>
   );
 }

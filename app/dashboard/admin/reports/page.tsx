@@ -71,7 +71,7 @@ export default async function ReportsPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  Analyze service plans and outcomes.
+                  Analyze logs
                 </p>
               </CardContent>
             </Card>

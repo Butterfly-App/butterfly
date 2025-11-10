@@ -22,7 +22,7 @@ const navItems = [
     icon: ClipboardList,
   },
   {
-    title: "Service Plans",
+    title: "Logs",
     href: "/dashboard/staff/service-plans",
     icon: FileText,
   },
