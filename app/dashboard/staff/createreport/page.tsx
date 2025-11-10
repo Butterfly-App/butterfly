@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import ClientForm from "./client-form";
+import ClientSection from "./log-section";
 
 export default async function CreateReportPage() {
   const supabase = await createClient();
@@ -25,14 +25,32 @@ export default async function CreateReportPage() {
     redirect("/login");
   }
 
-  // Get list of all clients
-  const { data: clientnames, error } = await supabase
+  // Get list of all clients with id and name
+  const { data: clients, error: clientError } = await supabase
     .from('clients')
-    .select('name');
+    .select('id, first_name, last_name');
 
-  if (error) {
-    console.error('Error fetching clients:', error);
+  if (clientError) {
+    console.error('Error fetching clients:', clientError);
   }
+
+  const clientFullNames = clients?.map(c => ({
+    id: c.id,
+    name: `${c.first_name} ${c.last_name}`
+    })
+  ) || [];
+
+  // Get list of all logs with creator, created_at, and client_id
+  const { data: allLogs, error: logsError } = await supabase
+    .from('logs')
+    .select('*');
+
+  if (logsError) {
+    console.error('Error fetching logs:', logsError);
+  }
+
+  const safeClients = clientFullNames || [];
+  const safeAllLogs = allLogs || [];
 
   return (
     <DashboardLayout
@@ -60,17 +78,22 @@ export default async function CreateReportPage() {
               </p>
             </div>
           </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Select Client</CardTitle>
-              <CardDescription>Choose a client to create a report for</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ClientForm clientnames={clientnames || []} />
-            </CardContent>
-          </Card>
         </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Select Client</CardTitle>
+            <CardDescription>Choose a client to create a report for</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {clientError && (
+              <p className="text-red-600 mb-4">Error loading clients. Please try again.</p>
+            )}
+            {safeClients.length === 0 && !clientError && (
+              <p className="text-zinc-600 mb-4">No clients found.</p>
+            )}
+            <ClientSection clientFullNames={safeClients} allLogs={safeAllLogs} />
+          </CardContent>
+        </Card>         
       </div>
     
   );
