@@ -28,6 +28,23 @@ function displayName(client: {
   );
 }
 
+const photoKeys = [
+  "photo_url",
+  "avatar_url",
+  "profile_photo",
+  "image_url",
+  "picture",
+  "photo",
+] as const;
+
+function getPhotoUrl(obj: unknown): string | undefined {
+  if (!obj || typeof obj !== "object") return undefined;
+  for (const k of photoKeys) {
+    const v = (obj as Record<string, unknown>)[k];
+    if (typeof v === "string" && v.trim()) return v;
+  }
+  return undefined;
+}
 
 
 export default async function ClientLayout({
@@ -50,15 +67,10 @@ export default async function ClientLayout({
       <div className="relative">
         <Avatar className="size-16 ring-2 ring-zinc-200 dark:ring-zinc-800">
           <AvatarImage
-            src={
-              // try common fields; adjust to your schema
-              client.photo_url ||
-              client.avatar_url ||
-              client.profile_photo ||
-              undefined
-            }
-            alt={`${client.first_name ?? ""} ${client.last_name ?? ""}`}
-          />
+  src={getPhotoUrl(client)}
+  alt={`${client.first_name ?? ""} ${client.last_name ?? ""}`}
+/>
+
           <AvatarFallback className="text-base font-medium">
             {getInitials(client.first_name, client.last_name)}
           </AvatarFallback>
