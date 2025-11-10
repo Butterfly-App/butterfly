@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getUserRole } from "@/lib/auth/roles-server";
-import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
+
 import { AdminNavbar } from "@/components/admin/admin-navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -23,11 +23,7 @@ export default async function SettingsPage() {
   }
 
   return (
-    <DashboardLayout
-      userEmail={user.email!}
-      userRole="admin"
-      title="System Settings"
-    >
+
       <div className="space-y-6">
         <AdminNavbar />
 
@@ -90,6 +86,6 @@ export default async function SettingsPage() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    
   );
 }

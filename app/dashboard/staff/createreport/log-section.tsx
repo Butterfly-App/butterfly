@@ -5,15 +5,15 @@ import LogForm from "./log-form";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 type ClientSectionProps = {
-  clients: { id: string; name: string }[];
+  clientFullNames: { id: string; name: string }[];
   allLogs: Record<string, any>[]; // Changed to accept any log structure
 };
 
-export default function ClientSection({ clients = [], allLogs = [] }: ClientSectionProps) {
+export default function ClientSection({ clientFullNames = [], allLogs = [] }: ClientSectionProps) {
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   
   // Find the selected client to display the name
-  const selectedClient = clients.find(c => c.id === selectedClientId);
+  const selectedClient = clientFullNames.find(c => c.id === selectedClientId);
   
   // Filter logs for the selected client
   const clientLogs = selectedClientId
@@ -21,14 +21,14 @@ export default function ClientSection({ clients = [], allLogs = [] }: ClientSect
     : [];
 
   const handleClientSelect = (clientName: string) => {
-    const client = clients.find(c => c.name === clientName);
+    const client = clientFullNames.find(c => c.name === clientName);
     setSelectedClientId(client?.id || null);
   };
 
   return (
     <>
       <ClientForm 
-        clientnames={clients.map(c => ({ name: c.name }))} 
+        clientnames={clientFullNames.map(c => ({ name: c.name }))} 
         onClientSelect={handleClientSelect} 
       />
       {selectedClient && (
