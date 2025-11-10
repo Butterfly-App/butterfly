@@ -37,7 +37,7 @@ export default function ClientSection({ clientData = [], allLogs = [] }: ClientS
             <CardTitle>Select Logs for {selectedClient.name}</CardTitle>
           </CardHeader>
           <CardContent>
-            <LogForm logs={clientLogs} clientName={selectedClient.name} />
+            <LogForm logs={clientLogs} clientName={selectedClient.name} clientID={selectedClientId} />
           </CardContent>
         </Card>
       )}

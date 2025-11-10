@@ -8,9 +8,10 @@ import { title } from "process";
 type LogFormProps = {
   logs: Record<string, any>[]; 
   clientName?: string; 
+  clientID?: string | null;
 };
 
-export default function LogForm({ logs, clientName }: LogFormProps) {
+export default function LogForm({ logs, clientName, clientID}: LogFormProps) {
   const [selectedLogs, setSelectedLogs] = useState<string[]>([]);
   const [expandedLog, setExpandedLog] = useState<string | null>(null);
   const [generatedReport, setGeneratedReport] = useState<string>("");
@@ -126,7 +127,7 @@ export default function LogForm({ logs, clientName }: LogFormProps) {
       
     if (uploadError) {
       console.error('Upload error:', uploadError);
-      alert('Report generated but upload failed');
+      alert('Report failed to upload');
     } else {
       console.log('Upload success:', uploadError);
       alert('Report generated and uploaded successfully!');
@@ -152,7 +153,7 @@ export default function LogForm({ logs, clientName }: LogFormProps) {
       .from('reports')
       .insert([
         { 
-          client_id: null,
+          client_id: clientID,
           title: filename,
           document_url: documentUrl,
         },
