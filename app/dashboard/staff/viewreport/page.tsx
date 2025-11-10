@@ -88,7 +88,7 @@ export default async function ViewReportPage() {
               <CardDescription>Select a report to view details</CardDescription>
             </CardHeader>
             <CardContent>
-              <viewReportSection clientData={clientData} allReportData={allReportData} />
+              {/* <viewReportSection clientData={clientData} allReportData={allReportData} /> */}
             </CardContent>
           </Card>
         </div>

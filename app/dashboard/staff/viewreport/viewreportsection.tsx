@@ -37,7 +37,7 @@ export default function viewReportSection({ clientData = [], allReportData = [] 
             <CardTitle>Select a Report for {selectedClient.name}</CardTitle>
           </CardHeader>
           <CardContent>
-                <ReportForm clientReports={clientReports} />
+                {/* <ReportForm clientReports={clientReports} /> */}
           </CardContent>
         </Card>
       )}
