@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Users, Settings, BarChart3, FileText, ShieldCheck } from "lucide-react";
+import { Users, Settings, BarChart3, FileText, ShieldCheck, UserCog } from "lucide-react";
 
 const navItems = [
   {
@@ -12,9 +12,19 @@ const navItems = [
     icon: BarChart3,
   },
   {
+    title: "Schedule Management",
+    href: "/dashboard/admin/schedules",
+    icon: UserCog,
+  },
+  {
     title: "User Management",
     href: "/dashboard/admin/users",
     icon: Users,
+  },
+  {
+    title: "Client Management",
+    href: "/dashboard/admin/clients",
+    icon: UserCog,
   },
   {
     title: "System Settings",
