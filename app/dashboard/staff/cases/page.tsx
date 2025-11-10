@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getUserRole } from "@/lib/auth/roles-server";
-import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
+
 import { StaffNavbar } from "@/components/staff/staff-navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -22,11 +22,6 @@ export default async function CasesPage() {
   }
 
   return (
-    <DashboardLayout
-      userEmail={user.email!}
-      userRole={role!}
-      title="My Cases"
-    >
       <div className="space-y-6">
         <StaffNavbar />
 
@@ -51,6 +46,6 @@ export default async function CasesPage() {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
+    
   );
 }

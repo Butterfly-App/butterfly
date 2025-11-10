@@ -1,6 +1,9 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/client";
+import jsPDF from 'jspdf';
+import { title } from "process";
 
 type LogFormProps = {
   logs: Record<string, any>[]; // Accept any log structure
@@ -70,7 +73,7 @@ export default function LogForm({ logs, clientName }: LogFormProps) {
     setExpandedLog(expandedLog === logKey ? null : logKey);
   };
 
-  const generateReport = () => {
+  const generateReport = async () => {
     // Find the selected log objects
     const selectedLogObjects = logs.filter((log, index) => {
       const title = formatLogTitle(log);
@@ -100,6 +103,70 @@ export default function LogForm({ logs, clientName }: LogFormProps) {
 
     setGeneratedReport(reportText);
     setShowReport(true);
+
+    const supabase = createClient();
+    const pdfBlob = await generatePDFBlob(); // Generate PDF from report
+    
+    const today = new Date();
+    const dateString = today.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).replace(/\//g, '-');
+
+    const sanitizedClientName = clientName?.replace(/\s+/g, '_').toLowerCase() || 'client';
+    const filename = `${sanitizedClientName}_${dateString}`;
+    
+    const { data, error } = await supabase.storage
+      .from('reports')
+      .upload(`${filename}.pdf`, pdfBlob, {
+        contentType: 'application/pdf',
+        upsert : true
+      });
+      
+    if (error) {
+      console.error('Upload error:', error);
+      alert('Report generated but upload failed');
+    } else {
+      console.log('Upload success:', data);
+      alert('Report generated and uploaded successfully!');
+    }
+
+    // const { data, error } = await supabase
+    //   .from('reports')
+    //   .insert([
+    //     { id:
+    //       created_at: new 
+    //       client_id: null,
+    //       title: filename,
+    //       document_url: data?.path || '',
+    //     },
+    //   ])
+
+    // if (error) {
+    //   console.error('reports table insert error:', error);
+    // }
+    
+  };
+
+  const generatePDFBlob = async (): Promise<Blob> => {
+    const doc = new jsPDF();
+    const reportTitle = `${clientName}'s Report - ${new Date().toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    })}`;
+    
+    // Add content to PDF
+    doc.setFontSize(16);
+    doc.text(reportTitle, 10, 10);
+    
+    // Add the report text (you'll need to format this properly)
+    doc.setFontSize(12);
+    doc.text(generatedReport, 10, 20); // This needs proper line wrapping
+    
+    // Return as blob
+    return doc.output('blob');
   };
 
   const copyReportToClipboard = () => {

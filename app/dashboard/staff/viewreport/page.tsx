@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getUserRole } from "@/lib/auth/roles-server";
-import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
+
 import { StaffNavbar } from "@/components/staff/staff-navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,11 +37,7 @@ export default async function ViewReportPage() {
   }
 
   return (
-    <DashboardLayout
-      userEmail={user.email!}
-      userRole={role!}
-      title="View Reports"
-    >
+
       <div className="space-y-6">
         <StaffNavbar />
 
@@ -74,6 +70,6 @@ export default async function ViewReportPage() {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
+    
   );
 }

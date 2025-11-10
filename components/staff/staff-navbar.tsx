@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Users, ClipboardList, Calendar, FileText, BarChart3, BookOpen, FileBarChart } from "lucide-react";
+import { Users, ClipboardList, Calendar, FileText, BarChart3, BookOpen, FileBarChart, UserCog } from "lucide-react";
 
 const navItems = [
   {
@@ -12,9 +12,19 @@ const navItems = [
     icon: BarChart3,
   },
   {
+    title: "Schedule Management",
+    href: "/dashboard/staff/schedules",
+    icon: UserCog,
+  },
+  {
     title: "User Management",
     href: "/dashboard/staff/users",
     icon: Users,
+  },
+  {
+    title: "Client Management",
+    href: "/dashboard/staff/clients",
+    icon: UserCog,
   },
   {
     title: "My Cases",

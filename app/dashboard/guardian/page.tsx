@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getUserRole } from "@/lib/auth/roles-server";
-import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function GuardianDashboard() {
@@ -21,11 +21,7 @@ export default async function GuardianDashboard() {
   }
 
   return (
-    <DashboardLayout
-      userEmail={user.email!}
-      userRole={role!}
-      title="Guardian Dashboard"
-    >
+    
       <div className="space-y-6">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Welcome, Guardian</h2>
@@ -108,6 +104,6 @@ export default async function GuardianDashboard() {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
+    
   );
 }
