@@ -229,38 +229,62 @@ export async function getAllUsers(): Promise<{
 
     const supabase = await createClient();
 
-    // Fetch all users from profiles table
-    const { data: profiles, error: profilesError } = await supabase
+    // Fetch all clients
+    const { data: clients, error: clientsError } = await supabase
       .from("clients")
       .select(
         `
         id,
         first_name,
         last_name,
-        profiles (
-          id,
-          full_name
-        )
+        guardian_id
       `
       )
       .order("first_name", { ascending: true });
 
-    if (profilesError) {
-      console.error("Error fetching users:", profilesError);
+    if (clientsError) {
+      console.error("Error fetching users:", clientsError);
       return { error: "Failed to fetch users" };
     }
 
+    if (!clients) {
+      return { data: [] };
+    }
+
+    // Fetch guardian profiles for all clients
+    const guardianIds = clients
+      .map((c) => c.guardian_id)
+      .filter((id): id is string => id !== null);
+
+    const { data: guardianProfiles } = await supabase
+      .from("profiles")
+      .select("user_id, full_name")
+      .in("user_id", guardianIds);
+
+    // Create a map of guardian profiles
+    const guardianMap = new Map(
+      guardianProfiles?.map((g) => [g.user_id, g]) || []
+    );
+
     // Map to expected format
     const users =
-      profiles?.map((profile) => ({
-        id: profile.id,
-        first_name: profile.first_name,
-        last_name: profile.last_name,
-        guardian: {
-          id: profile.profiles?.id,
-          full_name: profile.profiles?.full_name,
-        },
-      })) || [];
+      clients.map((client) => {
+        const guardianProfile = client.guardian_id
+          ? guardianMap.get(client.guardian_id)
+          : null;
+
+        return {
+          id: client.id,
+          first_name: client.first_name,
+          last_name: client.last_name,
+          guardian: guardianProfile
+            ? {
+                id: guardianProfile.user_id,
+                full_name: guardianProfile.full_name,
+              }
+            : null,
+        };
+      });
 
     return { data: users };
   } catch (error) {
