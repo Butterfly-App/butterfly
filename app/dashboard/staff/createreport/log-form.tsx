@@ -102,7 +102,7 @@ export default function LogForm({ logs, clientName, clientID}: LogFormProps) {
     setShowReport(true);
 
     const supabase = createClient();
-    const pdfBlob = await generatePDFBlob(reportText); // Generate PDF from report
+    const pdfBlob = await generatePDFBlob();
     
     const today = new Date();
     const dateString = today.toLocaleDateString('en-US', {
@@ -162,7 +162,7 @@ export default function LogForm({ logs, clientName, clientID}: LogFormProps) {
     
   };
 
-  const generatePDFBlob = async (reportText: string): Promise<Blob> => {
+  const generatePDFBlob = async (): Promise<Blob> => {
     const doc = new jsPDF();
     const reportTitle = `${clientName}'s Report - ${new Date().toLocaleDateString('en-US', { 
       year: 'numeric', 
@@ -175,8 +175,10 @@ export default function LogForm({ logs, clientName, clientID}: LogFormProps) {
     doc.text(reportTitle, 10, 10);
     
     // Add the report text
-    const lines = doc.splitTextToSize(reportText, 180); 
-    doc.text(lines, 10, 20);
+    doc.setFontSize(12);
+    doc.text(generatedReport, 10, 20);
+    // const lines = doc.splitTextToSize(reportText, 180); 
+    // doc.text(lines, 10, 20);
     
     // Return as blob
     return doc.output('blob');
