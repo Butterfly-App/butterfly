@@ -76,6 +76,7 @@ export async function fetchRevisions(logId: string) {
       version,
       editor_id,
       content,
+      name,
       edited_at
     `)
     .eq('log_id', logId)

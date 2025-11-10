@@ -2,7 +2,6 @@
 import { useTransition } from 'react';
 import { updateLogAction } from '@/app/dashboard/staff/logs/actions';
 
-
 export function EditLogForm({ logId, currentContent }: { logId: string; currentContent: string }) {
   const [pending, startTransition] = useTransition();
 
@@ -13,6 +12,16 @@ export function EditLogForm({ logId, currentContent }: { logId: string; currentC
     >
       <input type="hidden" name="logId" value={logId} />
 
+      <label className="text-sm font-medium">Editor name</label>
+      <input
+        type="text"
+        name="editorName"
+        className="w-full rounded-lg border border-zinc-300 bg-white p-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950"
+        placeholder="e.g., Raiyana Rahman"
+        required
+      />
+
+      <label className="text-sm font-medium">Edit note</label>
       <textarea
         name="content"
         className="w-full rounded-lg border border-zinc-300 bg-white p-3 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950"
