@@ -1,7 +1,7 @@
 'use client';
-
 import { useTransition } from 'react';
-import { updateLogAction } from '@/app/dashboard/logs/actions';
+import { updateLogAction } from '@/app/dashboard/staff/logs/actions';
+
 
 export function EditLogForm({ logId, currentContent }: { logId: string; currentContent: string }) {
   const [pending, startTransition] = useTransition();

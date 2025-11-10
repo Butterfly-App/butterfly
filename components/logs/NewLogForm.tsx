@@ -1,7 +1,6 @@
 'use client';
-
 import { useTransition } from 'react';
-import { createLogAction } from '@/app/dashboard/logs/actions';
+import { createLogAction } from '@/app/dashboard/staff/logs/actions';
 
 export function NewLogForm({ clients }: { clients: { id: string; name: string }[] }) {
   const [pending, startTransition] = useTransition();

@@ -1,7 +1,7 @@
 'use client';
-
 import { useEffect, useState } from 'react';
-import { fetchRevisions } from '@/app/dashboard/logs/actions';
+import { fetchRevisions } from '@/app/dashboard/staff/logs/actions';
+
 
 type Revision = {
   version: number;

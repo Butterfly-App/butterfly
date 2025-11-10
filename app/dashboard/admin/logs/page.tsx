@@ -5,6 +5,9 @@ import { ViewHistory } from '@/components/logs/ViewHistory';
 import { fetchClients } from '@/app/dashboard/logs/actions'; // or './actions' if colocated
 import { getUserRole } from '@/lib/auth/roles-server';        // if you have this helper
 
+
+
+
 export default async function LogsPage() {
   const supabase = await createClient();
   const [{ data: { user } }, role, clientsRes, logsRes] = await Promise.all([
