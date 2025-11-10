@@ -22,11 +22,7 @@ export default async function ServicePlansPage() {
   }
 
   return (
-    <DashboardLayout
-      userEmail={user.email!}
-      userRole={role!}
-      title="Service Plans"
-    >
+    
       <div className="space-y-6">
         <StaffNavbar />
 

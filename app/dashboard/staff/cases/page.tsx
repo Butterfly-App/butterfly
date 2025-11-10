@@ -22,11 +22,6 @@ export default async function CasesPage() {
   }
 
   return (
-    <DashboardLayout
-      userEmail={user.email!}
-      userRole={role!}
-      title="My Cases"
-    >
       <div className="space-y-6">
         <StaffNavbar />
 

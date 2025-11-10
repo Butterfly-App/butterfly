@@ -19,11 +19,7 @@ export default async function GuardianSchedulesPage() {
   }
 
   return (
-    <DashboardLayout
-      userEmail={user.email!}
-      userRole={role}
-      title="My Schedule"
-    >
+
       <div className="px-6">
         <MySchedulePageClient />
       </div>

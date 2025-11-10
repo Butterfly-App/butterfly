@@ -23,11 +23,7 @@ export default async function AdminSchedulesPage() {
   }
 
   return (
-    <DashboardLayout
-      userEmail={user.email!}
-      userRole="admin"
-      title="Schedule Management"
-    >
+
       <div className="space-y-6">
         <AdminNavbar />
 

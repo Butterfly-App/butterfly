@@ -37,11 +37,7 @@ export default async function ViewReportPage() {
   }
 
   return (
-    <DashboardLayout
-      userEmail={user.email!}
-      userRole={role!}
-      title="View Reports"
-    >
+
       <div className="space-y-6">
         <StaffNavbar />
 

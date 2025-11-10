@@ -23,11 +23,7 @@ export default async function ReportsPage() {
   }
 
   return (
-    <DashboardLayout
-      userEmail={user.email!}
-      userRole="admin"
-      title="Reports"
-    >
+
       <div className="space-y-6">
         <AdminNavbar />
 

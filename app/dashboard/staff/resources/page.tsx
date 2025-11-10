@@ -22,11 +22,7 @@ export default async function ResourcesPage() {
   }
 
   return (
-    <DashboardLayout
-      userEmail={user.email!}
-      userRole={role!}
-      title="Resources"
-    >
+
       <div className="space-y-6">
         <StaffNavbar />
 

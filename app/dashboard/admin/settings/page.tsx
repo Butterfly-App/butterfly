@@ -23,11 +23,7 @@ export default async function SettingsPage() {
   }
 
   return (
-    <DashboardLayout
-      userEmail={user.email!}
-      userRole="admin"
-      title="System Settings"
-    >
+
       <div className="space-y-6">
         <AdminNavbar />
 

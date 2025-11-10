@@ -22,11 +22,7 @@ export default async function AppointmentsPage() {
   }
 
   return (
-    <DashboardLayout
-      userEmail={user.email!}
-      userRole={role!}
-      title="Appointments"
-    >
+
       <div className="space-y-6">
         <StaffNavbar />
 
