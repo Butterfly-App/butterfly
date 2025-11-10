@@ -51,6 +51,7 @@ const navItems = [
     href: "/dashboard/staff/resources",
     icon: BookOpen,
   },
+  {title: "Goals", href: "/dashboard/staff/goals", icon: BarChart3 },
 ];
 
 export function StaffNavbar() {

@@ -8,7 +8,7 @@ import {
   deleteGoal, 
   createSubgoal, 
   updateSubgoal 
-} from "@/app/dashboard/goals/actions";
+} from "@/app/dashboard/staff/goals/actions";
 import { toast } from "sonner";
 type Subgoal = {
   id: string;
@@ -97,7 +97,7 @@ export function GoalsManager({ clientId, initialGoals }: { clientId: string; ini
   async function handleCreateSubgoal(goalId: string, domain: string, met = false, reason?: string, otherReason?: string) {
     startTransition(async () => {
       try {
-        const subgoal = await createSubgoal(goalId, domain, met, reason, otherReason);
+        const subgoal = await createSubgoal(goalId, domain, domain, met, reason, otherReason);
         setGoals((prev) => prev.map((goal) => 
           goal.id === goalId 
             ? { ...goal, subgoals: [subgoal, ...(goal.subgoals || [])] }
@@ -113,7 +113,7 @@ export function GoalsManager({ clientId, initialGoals }: { clientId: string; ini
   async function handleToggleSubgoal(goalId: string, subId: string, met: boolean) {
     startTransition(async () => {
       try {
-        const updatedSubgoal = await updateSubgoal(subId, met);
+        const updatedSubgoal = await updateSubgoal(goalId, subId, met);
         setGoals((prev) =>
           prev.map((goal) =>
             goal.id === goalId
