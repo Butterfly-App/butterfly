@@ -42,6 +42,5 @@ next-env.d.ts
 
 CLAUDE.md
 supabase/
-package-lock.json
 package.json
 pnpm-lock.yaml
