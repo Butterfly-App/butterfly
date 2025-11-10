@@ -23,6 +23,7 @@ export function SchedulesPageClient() {
     setLoading(true);
     const result = await getSchedules();
     if (result.data) {
+      console.log(result.data)
       setSchedules(result.data);
       setFilteredSchedules(result.data);
     }
@@ -213,12 +214,14 @@ export function SchedulesPageClient() {
                   </div>
                   {schedule.assigned_staff && (
                     <div className="text-sm text-blue-600 dark:text-blue-400 mt-1 font-medium">
-                      Assigned to: {schedule.assigned_staff.email} ({schedule.assigned_staff.role})
+                      Assigned to: {schedule.assigned_staff.email} ({schedule.assigned_staff.full_name})
                     </div>
                   )}
                   {!schedule.is_all_users && (
                     <div className="text-sm text-gray-500 dark:text-gray-500 mt-1">
-                      Participants: {schedule.participants.length}
+                      Participants: {schedule.participants.map(participant => {
+                        return (<>{`${participant.clients.first_name} ${participant.clients.last_name}`}</>)
+                      })}
                     </div>
                   )}
                 </div>

@@ -45,12 +45,12 @@ export default async function GuardianDashboard() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Service Plans</CardTitle>
-              <CardDescription>Active service plans</CardDescription>
+              <CardTitle>Logs</CardTitle>
+              <CardDescription>Logs</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Review service plans and progress updates.
+                Logs and log history
               </p>
             </CardContent>
           </Card>

@@ -50,7 +50,7 @@ export async function getSchedules(): Promise<{
         schedules.map(async (schedule) => {
           const { data: participants } = await supabase
             .from("schedule_participants")
-            .select("*")
+            .select("*, clients(*)")
             .eq("schedule_id", schedule.id);
 
           // Fetch assigned staff profile if exists
@@ -58,9 +58,10 @@ export async function getSchedules(): Promise<{
           if (schedule.assigned_staff_id) {
             const { data: staffProfile } = await supabase
               .from("profiles")
-              .select("user_id, email, role")
+              .select("user_id, email, full_name, role")
               .eq("user_id", schedule.assigned_staff_id)
               .single();
+              console.log(staffProfile)
 
             if (staffProfile) {
               assignedStaff = staffProfile;
@@ -153,6 +154,8 @@ export async function createSchedule(input: CreateScheduleInput): Promise<{
         schedule_id: schedule.id,
         user_id: userId,
       }));
+
+      console.log(participants)
 
       const { error: participantsError } = await supabase
         .from("schedule_participants")
