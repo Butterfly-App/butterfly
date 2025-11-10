@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🦋 Butterfly  
+**Turning daily notes into meaning**
 
-## Getting Started
+Butterfly is a compassionate documentation platform designed to help care teams transform everyday support notes into meaningful stories. Notes are the everyday observations, reflections, and updates that staff members write while supporting individuals with disabilities, things that often get lost in paperwork.
+It’s built to show the person *behind* the paperwork: their routines, growth, and the places that matter to them.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🌤️ Why Butterfly
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Every day, support staff record notes, track goals, and document progress.  
+But buried in these logs are moments of joy, challenges, and change.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Butterfly brings these notes to life through maps, timelines, and clear reports that help caregivers, families, and organizations see the whole picture.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## ✨ What You Can Do
 
-To learn more about Next.js, take a look at the following resources:
+- **🗒️ Record Daily Logs**  
+  Capture daily notes about a client’s activities, behaviors, and experiences.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **🕓 Track Changes Over Time**  
+  Every edit is versioned, so you can see how understanding evolves with each update.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **🗺️ Visualize Landmarks & Community Activity**  
+  Logs with locations are displayed on an interactive map, showing favorite spots and patterns of engagement.
 
-## Deploy on Vercel
+- **🎯 Set and Track Goals**  
+  Define meaningful goals and sub-goals across domains such as Physical, Social, and Emotional wellbeing.  
+  If a goal isn’t met, staff can record a reason from guided options 
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **📄 Generate Reports (PDF)**  
+  Turn daily notes and their histories into polished PDF summaries for meetings and documentation.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **🔐 Role-Based Access**  
+  Different dashboards for Staff, Guardians, and Users — ensuring privacy and clarity.
+
+---
+
+## 🧩 Built With
+
+| Purpose | Technology |
+|----------|-------------|
+| Framework | [Next.js 16](https://nextjs.org) (App Router + Server Actions) |
+| Database | [Supabase (PostgreSQL)](https://supabase.com) |
+| Styling | [Tailwind CSS](https://tailwindcss.com) |
+| Maps | [Leaflet.js](https://leafletjs.com) |
+| Auth | Supabase Auth |
+| PDF Reports | [PDFKit](https://pdfkit.org) |
+| Package Manager | PNPM |
+
+---
+
+
+
+
+## 🚀 Try It Live
+
+Visit the live demo here:  
+👉 [https://butterfly-dusky.vercel.app](https://butterfly-dusky.vercel.app)
+
+No installation needed — the platform is live and ready to explore.
