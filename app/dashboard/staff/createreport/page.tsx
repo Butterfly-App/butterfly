@@ -76,6 +76,7 @@ export default async function CreateReportPage() {
           </div>
         </div>
       </div>
+      
       <Card>
         <CardHeader>
           <CardTitle>Select Client</CardTitle>
