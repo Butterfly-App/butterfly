@@ -112,7 +112,8 @@ export function ClientList({ clients, basePath }: ClientListProps) {
                   </TableCell>
                   <TableCell>
                     <Button variant="ghost" size="sm" asChild>
-                      <Link href={`${basePath}/clients/${client.id}`}>
+                      <Link href={`${basePath}/clients/${client.id}/about`}>
+
                         View
                       </Link>
                     </Button>
