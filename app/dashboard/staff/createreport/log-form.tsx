@@ -77,12 +77,17 @@ export default function LogForm({ logs, clientName, clientID}: LogFormProps) {
       return selectedLogs.includes(title);
     });
 
+    console.log('Selected log objects:', selectedLogObjects);
+
     // Build the report text
     let reportText = "";
     
     selectedLogObjects.forEach((log, index) => {
       const title = formatLogTitle(log);
       const content = formatLogContent(log);
+      
+      console.log('Processing log:', title);
+      console.log('Content:', content);
       
       // Add log title
       reportText += `${title}\n\n`;
@@ -98,11 +103,16 @@ export default function LogForm({ logs, clientName, clientID}: LogFormProps) {
       }
     });
 
+    console.log('Final reportText:', reportText);
+    console.log('reportText length:', reportText.length);
+
     setGeneratedReport(reportText);
     setShowReport(true);
 
     const supabase = createClient();
-    const pdfBlob = await generatePDFBlob();
+    const pdfBlob = await generatePDFBlob(reportText); // Pass reportText directly
+    
+    console.log('PDF Blob size:', pdfBlob.size);
     
     const today = new Date();
     const dateString = today.toLocaleDateString('en-US', {
@@ -110,9 +120,10 @@ export default function LogForm({ logs, clientName, clientID}: LogFormProps) {
       month: '2-digit',
       day: '2-digit'
     }).replace(/\//g, '-');
+    const timestamp = Date.now(); // Add timestamp to avoid caching
 
     const cleanClientName = clientName?.replace(/\s+/g, '_').toLowerCase() || 'client';
-    const filename = `${cleanClientName}_${dateString}`;
+    const filename = `${cleanClientName}_${dateString}_${timestamp}`;
     
     const { data: uploadData, error:uploadError } = await supabase.storage
       .from('reports')
@@ -125,7 +136,7 @@ export default function LogForm({ logs, clientName, clientID}: LogFormProps) {
       console.error('Upload error:', uploadError);
       alert('Report failed to upload');
     } else {
-      console.log('Upload success:', uploadError);
+      console.log('Upload success:', uploadData);
       alert('Report generated and uploaded successfully!');
     }
 
@@ -162,7 +173,10 @@ export default function LogForm({ logs, clientName, clientID}: LogFormProps) {
     
   };
 
-  const generatePDFBlob = async (): Promise<Blob> => {
+  const generatePDFBlob = async (reportText: string): Promise<Blob> => {
+    console.log('generatePDFBlob called with reportText:', reportText);
+    console.log('reportText length in PDF function:', reportText.length);
+    
     const doc = new jsPDF();
     const reportTitle = `${clientName}'s Report - ${new Date().toLocaleDateString('en-US', { 
       year: 'numeric', 
@@ -170,18 +184,49 @@ export default function LogForm({ logs, clientName, clientID}: LogFormProps) {
       day: 'numeric' 
     })}`;
     
-    // Add content to PDF
-    doc.setFontSize(16);
-    doc.text(reportTitle, 10, 10);
+    // Page settings
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+    const maxWidth = pageWidth - (margin * 2);
+    let yPosition = 20;
     
-    // Add the report text
-    doc.setFontSize(12);
-    doc.text(generatedReport, 10, 20);
-    // const lines = doc.splitTextToSize(reportText, 180); 
-    // doc.text(lines, 10, 20);
+    // Add title
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(reportTitle, margin, yPosition);
+    yPosition += 10;
+    
+    // Add a line separator
+    doc.setLineWidth(0.5);
+    doc.line(margin, yPosition, pageWidth - margin, yPosition);
+    yPosition += 10;
+    
+    // Reset font for content
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    
+    // Split text into lines and add to PDF
+    const lines = doc.splitTextToSize(reportText, maxWidth);
+    console.log('Number of lines after split:', lines.length);
+    console.log('First few lines:', lines.slice(0, 5));
+    
+    // Add each line
+    lines.forEach((line: string) => {
+      // Check if we need a new page
+      if (yPosition > pageHeight - 20) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      
+      doc.text(line, margin, yPosition);
+      yPosition += 5;
+    });
     
     // Return as blob
-    return doc.output('blob');
+    const blob = doc.output('blob');
+    console.log('Generated blob size:', blob.size);
+    return blob;
   };
 
   const copyReportToClipboard = () => {
