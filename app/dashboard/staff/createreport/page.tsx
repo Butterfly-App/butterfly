@@ -3,13 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getUserRole } from "@/lib/auth/roles-server";
 
 import { StaffNavbar } from "@/components/staff/staff-navbar";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import {Card,CardContent,CardDescription,CardHeader,CardTitle} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -33,7 +27,7 @@ export default async function CreateReportPage() {
     redirect("/login");
   }
 
-  // Get list of all clients with id and name
+  // Get list of all clients with their id and name
   const { data: clients, error: clientError } = await supabase
     .from("clients")
     .select("id, first_name, last_name");
@@ -42,13 +36,13 @@ export default async function CreateReportPage() {
     console.error("Error fetching clients:", clientError);
   }
 
-  const clientFullNames =
+  const clientData =
     clients?.map((c) => ({
       id: c.id,
       name: `${c.first_name} ${c.last_name}`,
     })) || [];
 
-  // Get list of all logs with creator, created_at, and client_id
+  // Get list of all logs
   const { data: allLogs, error: logsError } = await supabase
     .from("logs")
     .select("*");
@@ -57,7 +51,7 @@ export default async function CreateReportPage() {
     console.error("Error fetching logs:", logsError);
   }
 
-  const safeClients = clientFullNames || [];
+  const safeClients = clientData || [];
   const safeAllLogs = allLogs || [];
 
   return (
@@ -98,7 +92,7 @@ export default async function CreateReportPage() {
           {safeClients.length === 0 && !clientError && (
             <p className="text-zinc-600 mb-4">No clients found.</p>
           )}
-          <ClientSection clientFullNames={safeClients} allLogs={safeAllLogs} />
+          <ClientSection clientData={safeClients} allLogs={safeAllLogs} />
         </CardContent>
       </Card>
     </div>

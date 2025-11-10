@@ -158,7 +158,7 @@ export default function LogForm({ logs, clientName }: LogFormProps) {
         },
       ])
 
-    if (addReportError || !addReport) {
+    if (addReportError) {
       console.error('reports table insert error:', addReportError);
     }
     
