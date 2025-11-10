@@ -6,10 +6,10 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 type ClientSectionProps = {
   clients: { id: string; name: string }[];
-  
+  userName: string;
 };
 
-export default function ClientSection({ clients = [] }: ClientSectionProps) {
+export default function ClientSection({ clients = [], userName}: ClientSectionProps) {
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   
   // Find the selected client to display the name
@@ -32,7 +32,11 @@ export default function ClientSection({ clients = [] }: ClientSectionProps) {
             <CardTitle>Create Log for {selectedClient.name}</CardTitle>
           </CardHeader>
           <CardContent>
-            <LogForm clientName={selectedClient.name} clientID={selectedClient.id}/>
+            <LogForm 
+            clientName={selectedClient.name} 
+            clientID={selectedClient.id}
+            userName={userName}
+            />
           </CardContent>
         </Card>
       )}

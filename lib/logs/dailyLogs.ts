@@ -1,11 +1,12 @@
-
-/*class DailyLog {
-    interface Log{
+interface Log{
     creator: string;
-    startDateTime: Date;
-    endDateTime: Date;
+    dateCreated: string;
+    startDateTime: string;
+    endDateTime: string;
     note: string;
-    location?: string
+    location?: string;
+    videos?: string[];
+    photos?: string[]
 }
 
 function createLog (){
@@ -16,6 +17,10 @@ function createLog (){
 function retrieveLogs() {
     return
 }
+
+
+/*class DailyLog {
+    
 
 
 

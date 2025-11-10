@@ -8,7 +8,7 @@ import { StaffNavbar } from "@/components/staff/staff-navbar";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import ClientSection from "./log-section-equivalent";
+import ClientSection from "./client-form";
 
 
 export default async function CreateLog(){
@@ -93,7 +93,10 @@ export default async function CreateLog(){
                         {safeClients.length === 0 && !clientError && (
                         <p className="text-zinc-600 mb-4">No clients found.</p>
                         )}
-                        <ClientSection clients={safeClients} />
+                        <ClientSection 
+                        clients={safeClients} 
+                        userName={user.id}
+                        />
                     </CardContent>
                 </Card>         
             </div>
