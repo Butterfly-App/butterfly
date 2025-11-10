@@ -3,7 +3,7 @@ import { useState } from "react";
 
 type ClientFormProps = {
   clientnames: { name: string }[];
-  onClientSelect: (clientName: string) => void; // New prop
+  onClientSelect: (clientName: string) => void;
 };
 
 export default function ClientForm({ clientnames, onClientSelect }: ClientFormProps) {

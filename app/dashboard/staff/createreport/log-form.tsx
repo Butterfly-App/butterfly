@@ -6,8 +6,8 @@ import jsPDF from 'jspdf';
 import { title } from "process";
 
 type LogFormProps = {
-  logs: Record<string, any>[]; // Accept any log structure
-  clientName?: string; // Optional client name to include in report
+  logs: Record<string, any>[]; 
+  clientName?: string; 
 };
 
 export default function LogForm({ logs, clientName }: LogFormProps) {
@@ -114,38 +114,53 @@ export default function LogForm({ logs, clientName }: LogFormProps) {
       day: '2-digit'
     }).replace(/\//g, '-');
 
-    const sanitizedClientName = clientName?.replace(/\s+/g, '_').toLowerCase() || 'client';
-    const filename = `${sanitizedClientName}_${dateString}`;
+    const cleanClientName = clientName?.replace(/\s+/g, '_').toLowerCase() || 'client';
+    const filename = `${cleanClientName}_${dateString}`;
     
-    const { data, error } = await supabase.storage
+    const { data: uploadData, error:uploadError } = await supabase.storage
       .from('reports')
       .upload(`${filename}.pdf`, pdfBlob, {
         contentType: 'application/pdf',
         upsert : true
       });
       
-    if (error) {
-      console.error('Upload error:', error);
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
       alert('Report generated but upload failed');
     } else {
-      console.log('Upload success:', data);
+      console.log('Upload success:', uploadError);
       alert('Report generated and uploaded successfully!');
     }
 
-    // const { data, error } = await supabase
-    //   .from('reports')
-    //   .insert([
-    //     { id:
-    //       created_at: new 
-    //       client_id: null,
-    //       title: filename,
-    //       document_url: data?.path || '',
-    //     },
-    //   ])
+    if (uploadError || !uploadData) {
+      console.error('Storage upload error:', uploadError?.message || 'Upload data is null');
+      return; // Stop execution if upload fails
+   }
 
-    // if (error) {
-    //   console.error('reports table insert error:', error);
-    // }
+    const { data: publicURLData } = supabase.storage
+      .from('reports')
+      .getPublicUrl(uploadData.path);
+
+    if (!publicURLData) {
+      console.error('Could not generate public URL.');
+      return;
+    }
+
+    const documentUrl = publicURLData.publicUrl;
+
+    const { data:addReport, error:addReportError } = await supabase
+      .from('reports')
+      .insert([
+        { 
+          client_id: null,
+          title: filename,
+          document_url: documentUrl,
+        },
+      ])
+
+    if (addReportError || !addReport) {
+      console.error('reports table insert error:', addReportError);
+    }
     
   };
 
@@ -161,9 +176,9 @@ export default function LogForm({ logs, clientName }: LogFormProps) {
     doc.setFontSize(16);
     doc.text(reportTitle, 10, 10);
     
-    // Add the report text (you'll need to format this properly)
+    // Add the report text 
     doc.setFontSize(12);
-    doc.text(generatedReport, 10, 20); // This needs proper line wrapping
+    doc.text(generatedReport, 10, 20);
     
     // Return as blob
     return doc.output('blob');

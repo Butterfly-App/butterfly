@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 type ClientSectionProps = {
   clientFullNames: { id: string; name: string }[];
-  allLogs: Record<string, any>[]; // Changed to accept any log structure
+  allLogs: Record<string, any>[];
 };
 
 export default function ClientSection({ clientFullNames = [], allLogs = [] }: ClientSectionProps) {

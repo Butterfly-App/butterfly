@@ -30,8 +30,6 @@ export default async function ViewReportPage() {
     .from('reports')
     .select('title');
 
-    console.log(reporttitles)
-
   if (error) {
     console.error('Error fetching reports:', error);
   }
